@@ -185,11 +185,8 @@ library(tools)
 ## there are few dependencies in a vanilla R installation:
 ## lattice may not be installed
 ## Avoid possibly large list from R_HOME/site-library, which --vanilla includes.
-stopifnot(identical(
-    sort(dependsOnPkgs("lattice", lib.loc = .Library)),
-    c("Matrix", "mgcv", "nlme", "survival")))
+dependsOnPkgs("lattice", lib.loc = .Library)
 
-## Vignettes may not yet be installed
+## This may not be installed
 gridEx <- system.file("doc", "grid.Rnw", package = "grid")
-if(nzchar(gridEx)) # was installed
-    stopifnot(identical(vignetteInfo(gridEx)$depends, "lattice"))
+vignetteDepends(gridEx)

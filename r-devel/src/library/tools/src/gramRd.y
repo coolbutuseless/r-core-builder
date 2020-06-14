@@ -1214,7 +1214,7 @@ static keywords[] = {
     { "\\preformatted", VERBMACRO },
     
     { "\\samp",    VERBMACRO },
-    { "\\special", RCODEMACRO },
+    { "\\special", VERBMACRO },
     { "\\url",     VERBMACRO },
     { "\\verb",    VERBMACRO },
     

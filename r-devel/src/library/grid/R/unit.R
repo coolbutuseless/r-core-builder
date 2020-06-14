@@ -311,7 +311,6 @@ Summary.unit <- function(..., na.rm=FALSE) {
     if (nMatches != 0) {
         data <- lapply(x, .subset2, 2L)
         amount <- vapply(x, .subset2, numeric(1), 1L)[matchUnits]
-        amount <- rep(amount, lengths(data[matchUnits]))
         matchData <- unclass(unlist(data[matchUnits], recursive = FALSE))
         for (i in seq_along(amount)) {
             if (amount[i] != 1) 
@@ -430,10 +429,13 @@ pSummary <- function(..., op) {
 # Unit subsetting
 #########################
 
-## 'top' argument retained to avoid breaking any uses from it
-## that are hang-overs from old unit implementation
+# The idea of the "top" argument is to allow the function to
+# know if it has been called from the command-line or from
+# a previous (recursive) call to "[.unit" or "[.unit.arithmetic"
+# this allows recycling beyond the end of the unit object
+# except at the top level
 
-`[.unit` <- function(x, index, ..., top = TRUE) {
+`[.unit` <- function(x, index, top = TRUE) {
     x <- upgradeUnit(x) # guard against old unit
     attr <- attributes(x)
     x <- unclass(x)

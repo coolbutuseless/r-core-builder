@@ -26,7 +26,7 @@
   Defunct functions in package \pkg{methods}.
 }
 \usage{
-% Defunct in 2.8.0 ;  removed for 4.0.0
+% Removed in 2.8.0
 getAccess(ClassDef)
 getClassName(ClassDef)
 getClassPackage(ClassDef)
@@ -42,13 +42,13 @@ removeMethodsObject(f, where)
 
 seemsS4Object(object)
 
-% Defunct in 2.9.0;  removed for 4.0.0
+% Removed in 2.9.0
 allGenerics()
 
 % Removed in 2.11.0
 trySilent(expr)
 
-% Defunct in 3.0.0;  removed for 4.0.0
+% Removed in 3.0.0
 traceOn(what, tracer=browseAll, exit=NULL)
 traceOff(what)
 }

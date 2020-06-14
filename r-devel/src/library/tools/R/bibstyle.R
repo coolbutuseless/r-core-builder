@@ -94,12 +94,11 @@ makeJSS <- function() {
     fmtSchool <- plainclean
     ## fmtTechreportnumber <- labelclean(prefix="Technical Report ")
     fmtUrl <- label(prefix="\\url{", suffix="}")
-    fmtTitle <- function(title) 
-        if (length(title)) {
-            title <- gsub("%", "\\\\\\%", title)
+    fmtTitle <- function(title)
+        if (length(title))
             paste0("\\dQuote{",
                    addPeriod(collapse(cleanupLatex(title))), "}")
-        }
+
     fmtYear <- function(year) {
         if (!length(year)) year <- "????"
         paste0("(", collapse(year), ")")
@@ -159,13 +158,7 @@ makeJSS <- function() {
     }
 
     extraInfo <- function(paper) {
-    	# PR#17725:  DOIs can contain % signs, and need multiple 
-    	#            levels of escaping when translated to Rd.
-    	escapeDOIPercent <- function(s) gsub("%", 
-    					  paste0(paste(rep("\\", 11), collapse=""), "%"),
-    					  fixed = TRUE,
-    					  s)
-        result <- paste(c(fmtDOI(escapeDOIPercent(paper$doi)), fmtNote(paper$note),
+        result <- paste(c(fmtDOI(paper$doi), fmtNote(paper$note),
                           fmtEprint(paper$eprint), fmtUrl(paper$url)),
                         collapse=", ")
         if (nzchar(result)) result

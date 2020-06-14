@@ -14,7 +14,7 @@
 \usage{
 warning(\dots, call. = TRUE, immediate. = FALSE, noBreaks. = FALSE,
         domain = NULL)
-suppressWarnings(expr, classes = "warning")
+suppressWarnings(expr)
 }
 \arguments{
   \item{\dots}{zero or more objects which can be coerced to character
@@ -29,8 +29,6 @@ suppressWarnings(expr, classes = "warning")
   \item{expr}{expression to evaluate.}
   \item{domain}{see \code{\link{gettext}}.  If \code{NA}, messages will
     not be translated, see also the note in \code{\link{stop}}.}
-  \item{classes}{character, indicating which classes of warnings should
-    be suppressed.}
 }
 \details{
   The result \emph{depends} on the value of

@@ -89,8 +89,6 @@ typedef struct {
     int fontsize;			/* Size in points */
     double pointsize;			/* Size in points */
     char basefontfamily[500];           /* Initial font family */
-    char symbolfamily[500];             /* Symbol font family */
-    Rboolean usePUA;
 
     int windowWidth;			/* Window width (pixels) */
     int windowHeight;			/* Window height (pixels) */

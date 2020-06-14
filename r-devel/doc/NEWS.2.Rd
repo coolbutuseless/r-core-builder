@@ -6,11 +6,9 @@
 \encoding{UTF-8}
 
 \section{LATER NEWS}{
-  \itemize{
-    \item News for \R 3.0.0 and later can be found in file
-    \file{NEWS.Rd} in the \R sources and files \file{NEWS} and
-    \file{doc/html/NEWS.html} in an \R build.
-  }
+  News for \R 3.0.0 and later can be found in file \file{NEWS.Rd} in the
+  \R sources and files \file{NEWS} and \file{doc/html/NEWS.html}
+  in an \R build.
 }
 
 \section{\Rlogo CHANGES IN R VERSION 2.15.3}{
@@ -6982,8 +6980,6 @@
 }
 
 \section{OLDER NEWS}{
-  \itemize{
-    \item News for \R 2.9.2 patched and earlier can be found in files
-    such as \file{NEWS.2} in the \file{doc} directory.
-  }
+  News for \R 2.9.2 patched and earlier can be found in files
+  such as \file{NEWS.2} in the \file{doc} directory.
 }

@@ -3,9 +3,8 @@
 ####  Part 2
 ####  ======  Recommended packages allowed  .. output tests *sloppily*
 
-srcdir <- file.path(Sys.getenv("SRCDIR"), "eval-fns.R")
-source(if(file.exists(srcdir)) srcdir else "./eval-fns.R", echo = TRUE)
-rm("srcdir")
+source(file.path(Sys.getenv("SRCDIR"), "eval-fns.R"), echo = TRUE)
+                                        #---------
 
 if(require("Matrix")) withAutoprint({ cat("Trying some Matrix objects, too\n")
     D5. <- Diagonal(x = 5:1)

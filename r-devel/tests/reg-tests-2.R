@@ -4,7 +4,7 @@
 pdf("reg-tests-2.pdf", encoding = "ISOLatin1.enc")
 
 ## force standard handling for data frames
-options(stringsAsFactors=FALSE) # R >= 4.0.0
+options(stringsAsFactors=TRUE)
 options(useFancyQuotes=FALSE)
 
 ### moved from various .Rd files
@@ -62,8 +62,7 @@ summary(bI <- besselI(x = x <- 10:700, 1))
 ## data.frame
 set.seed(123)
 L3 <- LETTERS[1:3]
-d <- data.frame(cbind(x=1, y=1:10), fac = sample(L3, 10, replace=TRUE),
-                stringsAsFactors=TRUE)
+d <- data.frame(cbind(x=1, y=1:10), fac = sample(L3, 10, replace=TRUE))
 str(d)
 (d0  <- d[, FALSE]) # NULL dataframe with 10 rows
 (d.0 <- d[FALSE, ]) # <0 rows> dataframe  (3 cols)
@@ -175,7 +174,7 @@ kronecker(fred, bill, make=TRUE)
 authors <- data.frame(
     surname = c("Tukey", "Venables", "Tierney", "Ripley", "McNeil"),
     nationality = c("US", "Australia", "US", "UK", "Australia"),
-    deceased = c("yes", rep("no", 4)), stringsAsFactors=TRUE)
+    deceased = c("yes", rep("no", 4)))
 books <- data.frame(
     name = c("Tukey", "Venables", "Tierney",
              "Ripley", "Ripley", "McNeil", "R Core"),
@@ -186,8 +185,7 @@ books <- data.frame(
               "Interactive Data Analysis",
               "An Introduction to R"),
     other.author = c(NA, "Ripley", NA, NA, NA, NA,
-		     "Venables & Smith"),
-	   stringsAsFactors=TRUE)
+                     "Venables & Smith"))
 b2 <- books; names(b2)[1] <- names(authors)[1]
 
 merge(authors, b2, all.x = TRUE)
@@ -225,8 +223,7 @@ tabulate(numeric(0))
 ## end of moved from tabulate.Rd
 
 ## ts
-# Ensure working arithmetic for 'ts' objects :
-z <- ts(matrix(1:900, 100, 3), start = c(1961, 1), frequency = 12)
+# Ensure working arithmetic for `ts' objects :
 stopifnot(z == z)
 stopifnot(z-z == 0)
 
@@ -485,7 +482,7 @@ rowsum(matrix(1:12, 3,4), c("Y","X","Y"))
 ## PR#1115 (saving strings with ascii=TRUE)
 x <- y <- unlist(as.list(
     parse(text=paste("\"\\", as.character(as.octmode(1:255)), "\"",sep=""))))
-save(x, ascii=TRUE, file=(fn <- tempfile(tmpdir = getwd())))
+save(x, ascii=TRUE, file=(fn <- tempfile()))
 load(fn)
 all(x==y)
 unlink(fn)
@@ -1322,15 +1319,13 @@ Mat <- matrix(c(1:3, letters[1:3], 1:3, LETTERS[1:3],
                 c("2004-01-01", "2004-02-01", "2004-03-01"),
                 c("2004-01-01 12:00", "2004-02-01 12:00", "2004-03-01 12:00")),
               3, 6)
-foo <- tempfile(tmpdir = getwd())
+foo <- tempfile()
 write.table(Mat, foo, col.names = FALSE, row.names = FALSE)
-read.table(foo, colClasses = c(NA, NA, "NULL", "character", "Date", "POSIXct"),
-           stringsAsFactors=TRUE)
+read.table(foo, colClasses = c(NA, NA, "NULL", "character", "Date", "POSIXct"))
 unlist(sapply(.Last.value, class))
-read.table(foo, colClasses = c("factor",NA,"NULL","factor","Date","POSIXct"),
-           stringsAsFactors=TRUE)
+read.table(foo, colClasses = c("factor",NA,"NULL","factor","Date","POSIXct"))
 unlist(sapply(.Last.value, class))
-read.table(foo, colClasses = c(V4="character"), stringsAsFactors=TRUE)
+read.table(foo, colClasses = c(V4="character"))
 unlist(sapply(.Last.value, class))
 unlink(foo)
 ## added in 2.0.0
@@ -1466,7 +1461,7 @@ stopifnot(inherits(res, "try-error"))
 
 
 ## (PR#7789) escaped quotes in the first five lines for read.table
-tf <- tempfile(tmpdir = getwd())
+tf <- tempfile()
 x <- c("6 'TV2  Shortland Street'",
        "2 'I don\\\'t watch TV at 7'",
        "1 'I\\\'m not bothered, whatever that looks good'",
@@ -2016,7 +2011,7 @@ dput(x, control="keepNA")
 dput(x)
 dput(x, control="all")
 dput(x, control=c("all", "S_compatible"))
-tmp <- tempfile(tmpdir = getwd())
+tmp <- tempfile()
 dput(x, tmp, control="all")
 stopifnot(identical(dget(tmp), x))
 dput(x, tmp, control=c("all", "S_compatible"))
@@ -2230,7 +2225,7 @@ qr.coef(qr(matrix(0:1, 1, dimnames=list(NULL, c("zero","one")))), 5)
 ## readChar read extra items, terminated on zeros
 x <- as.raw(65:74)
 readChar(x, nchar=c(3,3,0,3,3,3))
-f <- tempfile(tmpdir = getwd())
+f <- tempfile()
 writeChar("ABCDEFGHIJ", con=f, eos=NULL)
 readChar(f, nchar=c(3,3,0,3,3,3))
 unlink(f)
@@ -2702,8 +2697,7 @@ substitute(f(x), list(f = quote(g(y))))
 
 
 ## PR#15247 : str() on invalid data frame names (where print() works):
-d <- data.frame(1:3, "B", 4, stringsAsFactors=TRUE)
-names(d) <- c("A", "B\xba","C\xabcd")
+d <- data.frame(1:3, "B", 4); names(d) <- c("A", "B\xba","C\xabcd")
 str(d)
 ## gave an error in R <= 3.0.0
 
@@ -2809,12 +2803,12 @@ str(max(NA_character_, "bla"))
 
 ## When two entries needed to be cut to width, str() mixed up
 ## the values (reported by Gerrit Eichner)
-oldopts <- options(width=70)
+oldopts <- options(width=70, stringsAsFactors=TRUE)
 n <- 11      # number of rows of data frame
 M <- 10000   # order of magnitude of numerical values
 longer.char.string <- "zjtvorkmoydsepnxkabmeondrjaanutjmfxlgzmrbjp"
 X <- data.frame( A = 1:n * M,
-                 B = factor(rep(longer.char.string, n)))
+                 B = rep( longer.char.string, n))
 str( X, strict.width = "cut")
 options(oldopts)
 ## The first row of the str() result was duplicated.
@@ -3138,21 +3132,3 @@ cat("Error: ", M3, "\n")
 ## print.htest() with small 'digits'
 print(t.test(1:28), digits = 3)
 ## showed 'df = 30' from signif(*, digits=1) and too many digits for CI, in R <= 3.5.1
-
-
-## str(<d.frame w/ attrib>):
-treeA <- trees
-attr(treeA, "someA") <- 1:77
-str(treeA)
-## now shows the *length* of "someA"
-
-
-## summaryRprof() bug PR#15886 :
-Rprof(tf <- tempfile("Rprof.out", tmpdir = getwd()), memory.profiling=TRUE, line.profiling=FALSE)
-out <- lapply(1:10000, rnorm, n= 512)
-Rprof(NULL)
-if(interactive())
-    print(length(readLines(tf))) # ca. 10 .. 20 lines
-op <- options(warn = 2) # no warnings, even !
-for (cs in 1:21) s <- summaryRprof(tf, memory="tseries", chunksize=cs)
-options(op) ## "always" triggered an error (or a warning) in R <= 3.6.3

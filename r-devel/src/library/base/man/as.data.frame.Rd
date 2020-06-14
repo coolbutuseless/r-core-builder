@@ -34,15 +34,15 @@
 as.data.frame(x, row.names = NULL, optional = FALSE, \dots)
 
 \method{as.data.frame}{character}(x, \dots,
-              stringsAsFactors = FALSE)
+              stringsAsFactors = default.stringsAsFactors())
 
 \method{as.data.frame}{list}(x, row.names = NULL, optional = FALSE, \dots,
               cut.names = FALSE, col.names = names(x), fix.empty.names = TRUE,
-              stringsAsFactors = FALSE)
+              stringsAsFactors = default.stringsAsFactors())
 
 \method{as.data.frame}{matrix}(x, row.names = NULL, optional = FALSE,
               make.names = TRUE, \dots,
-              stringsAsFactors = FALSE)
+              stringsAsFactors = default.stringsAsFactors())
 
 is.data.frame(x)
 }

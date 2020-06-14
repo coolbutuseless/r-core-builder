@@ -1,6 +1,6 @@
 % File src/library/base/man/data.frame.Rd
 % Part of the R package, https://www.R-project.org
-% Copyright 1995-2020 R Core Team
+% Copyright 1995-2017 R Core Team
 % Distributed under GPL 2 or later
 
 \name{data.frame}
@@ -16,9 +16,9 @@
 \usage{
 data.frame(\dots, row.names = NULL, check.rows = FALSE,
            check.names = TRUE, fix.empty.names = TRUE,
-           stringsAsFactors = FALSE)
+           stringsAsFactors = default.stringsAsFactors())
 
-default.stringsAsFactors() # << this is deprecated !
+default.stringsAsFactors()
 }
 \arguments{
   \item{\dots}{these arguments are of either the form \code{value} or
@@ -40,8 +40,9 @@ default.stringsAsFactors() # << this is deprecated !
     rather name \code{""}.  Needs to be set to \code{FALSE} even when
     \code{check.names} is false if \code{""} names should be kept.}
   \item{stringsAsFactors}{logical: should character vectors be converted
-    to factors?  The \sQuote{factory-fresh} default has been \code{TRUE}
-    previously but has been changed to \code{FALSE} for \R 4.0.0.}
+    to factors?  The \sQuote{factory-fresh} default is \code{TRUE}, but
+    this can be changed by setting \code{\link{options}(stringsAsFactors
+      = FALSE)}.}
 }
 \value{
   A data frame, a matrix-like structure whose columns may be of
@@ -109,8 +110,7 @@ default.stringsAsFactors() # << this is deprecated !
   \code{default.stringsAsFactors} is a utility that takes
   \code{\link{getOption}("stringsAsFactors")} and ensures the result is
   \code{TRUE} or \code{FALSE} (or throws an error if the value is not
-  \code{NULL}).  This function is \bold{deprecated} now and will no longer
-  be available in the future.
+  \code{NULL}).
 }
 \note{
   In versions of \R prior to 2.4.0 \code{row.names} had to be

@@ -23,7 +23,6 @@
 \alias{diff.difftime}
 \alias{c.difftime}
 \alias{length<-.difftime}
-\alias{as.list.difftime}
 \alias{units}
 \alias{units<-}
 \alias{time interval} % used by mean.Rd

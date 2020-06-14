@@ -16,28 +16,24 @@
 bmp(filename = "Rplot\%03d.bmp",
     width = 480, height = 480, units = "px", pointsize = 12,
     bg = "white", res = NA, family = "", restoreConsole = TRUE,
-    type = c("windows", "cairo"), antialias,
-    symbolfamily="default")
+    type = c("windows", "cairo"), antialias)
 
 jpeg(filename = "Rplot\%03d.jpg",
      width = 480, height = 480, units = "px", pointsize = 12,
      quality = 75,
      bg = "white", res = NA, family = "", restoreConsole = TRUE,
-     type = c("windows", "cairo"), antialias,
-     symbolfamily="default")
+     type = c("windows", "cairo"), antialias)
 
 png(filename = "Rplot\%03d.png",
     width = 480, height = 480, units = "px", pointsize = 12,
     bg = "white", res = NA, family = "", restoreConsole = TRUE,
-    type = c("windows", "cairo", "cairo-png"), antialias,
-    symbolfamily="default")
+    type = c("windows", "cairo", "cairo-png"), antialias)
 
 tiff(filename = "Rplot\%03d.tif",
      width = 480, height = 480, units = "px", pointsize = 12,
      compression = c("none", "rle", "lzw", "jpeg", "zip", "lzw+p", "zip+p"),
      bg = "white", res = NA, family = "", restoreConsole = TRUE,
-     type = c("windows", "cairo"), antialias,
-     symbolfamily="default")
+     type = c("windows", "cairo"), antialias)
 }
 \arguments{
   \item{filename}{the path of the output file, up to 511 characters.  The
@@ -80,11 +76,6 @@ tiff(filename = "Rplot\%03d.tif",
 
     For allowed values and their effect (on fonts and lines, but not
     fills) with \code{type = "cairo"} see \code{\link{svg}}.}
-  \item{symbolfamily}{  For cairographics only:
-      a length-one character string that specifies the font family to
-      be used as the "symbol" font (e.g., for \link{plotmath} output).
-      The default value is "default", which means that R will choose
-      a default "symbol" font based on the graphics device capabilities.}
 }
 \details{
   Plots in PNG and JPEG format can easily be converted to many other

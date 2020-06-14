@@ -1,7 +1,7 @@
 #  File src/library/tools/R/QC.R
 #  Part of the R package, https://www.R-project.org
 #
-#  Copyright (C) 1995-2020 The R Core Team
+#  Copyright (C) 1995-2019 The R Core Team
 #
 #  This program is free software; you can redistribute it and/or modify
 #  it under the terms of the GNU General Public License as published by
@@ -517,7 +517,8 @@ function(package, dir, lib.loc = NULL,
         ## redefinitions obtained by methods::rematchDefinition().
         ## </NOTE>
         check_S4_methods <-
-            !isFALSE(as.logical(Sys.getenv("_R_CHECK_CODOC_S4_METHODS_")))
+            !identical(as.logical(Sys.getenv("_R_CHECK_CODOC_S4_METHODS_")),
+                       FALSE)
         if(check_S4_methods) {
             unRematchDef <- methods::unRematchDefinition
             get_formals_from_method_definition <- function(m)
@@ -3281,12 +3282,10 @@ function(x, ...)
 ### * .check_package_description
 
 .check_package_description <-
-function(dfile, strict = FALSE, db = NULL)
+function(dfile, strict = FALSE)
 {
-    if(is.null(db)) {
-        dfile <- file_path_as_absolute(dfile)
-        db <- .read_description(dfile)
-    }
+    dfile <- file_path_as_absolute(dfile)
+    db <- .read_description(dfile)
 
     standard_package_names <- .get_standard_package_names()
 
@@ -3974,8 +3973,7 @@ function(dir, makevars = c("Makevars.in", "Makevars"))
     if(!length(lines) || inherits(lines, "error"))
         return(bad_flags)
 
-    prefixes <- c("CPP", "C", "CXX", "CXX98", "CXX11", "CXX14", "CXX17",
-                  "CXX20", "F", "FC", "OBJC", "OBJCXX")
+    prefixes <- c("CPP", "C", "CXX", "CXX98", "CXX11", "CXX14", "CXX17", "F", "FC", "OBJC", "OBJCXX")
 
     uflags_re <- sprintf("^(%s)FLAGS: *(.*)$",
                          paste(prefixes, collapse = "|"))
@@ -4526,7 +4524,7 @@ function(x, ...)
 .check_package_datasets <-
 function(pkgDir)
 {
-    oLC_ct <- Sys.getlocale("LC_CTYPE"); on.exit(Sys.setlocale("LC_CTYPE", oLC_ct))
+    on.exit(Sys.setlocale("LC_CTYPE", Sys.getlocale("LC_CTYPE")))
     Sys.setlocale("LC_CTYPE", "C")
     oop <- options(warn = -1)
     on.exit(options(oop), add = TRUE)
@@ -4960,7 +4958,7 @@ function(dir)
     ## so as from R 2.5.0 we try to set a locale.
     ## Any package with no declared encoding should have only ASCII R
     ## code.
-    oLC_ct <- Sys.getlocale("LC_CTYPE"); on.exit(Sys.setlocale("LC_CTYPE", oLC_ct))
+    on.exit(Sys.setlocale("LC_CTYPE", Sys.getlocale("LC_CTYPE")))
     if(!is.na(enc)) {  ## try to use the declared encoding
         if(.Platform$OS.type == "windows") {
             ## "C" is in fact "en", and there are no UTF-8 locales
@@ -5013,7 +5011,7 @@ function(dir)
                                 warning = function(e) {
                                     .warnings <<- c(.warnings,
                                                     conditionMessage(e))
-                                    tryInvokeRestart("muffleWarning")
+                                    invokeRestart("muffleWarning")
                                 })
         } else {
             withCallingHandlers(tryCatch(parse(file),
@@ -5022,7 +5020,7 @@ function(dir)
                                 warning = function(e) {
                                     .warnings <<- c(.warnings,
                                                     conditionMessage(e))
-                                    tryInvokeRestart("muffleWarning")
+                                    invokeRestart("muffleWarning")
                                 })
         }
         ## (We show offending file paths starting with the base of the
@@ -6879,7 +6877,7 @@ function(x, ...)
 ## These are all done first.
 
 .check_package_CRAN_incoming <-
-function(dir, localOnly = FALSE, pkgSize = NA)
+function(dir, localOnly = FALSE)
 {
     out <- list()
     class(out) <- "check_package_CRAN_incoming"
@@ -6964,10 +6962,7 @@ function(dir, localOnly = FALSE, pkgSize = NA)
     if(grepl("(^|[.-])0[0-9]+", ver))
         out$version_with_leading_zeroes <- ver
     unlisted_version <- unlist(package_version(ver))
-    if(any(unlisted_version >= 1234 &
-           unlisted_version != as.integer(format(Sys.Date(), "%Y"))) &&
-       !config_val_to_logical(Sys.getenv("_R_CHECK_CRAN_INCOMING_SKIP_LARGE_VERSION_",
-                                         "FALSE")))
+    if(any(unlisted_version >= 1234 & unlisted_version != as.integer(format(Sys.Date(), "%Y"))))
         out$version_with_large_components <- ver
 
     .aspell_package_description_for_CRAN <- function(dir, meta = NULL) {
@@ -7244,9 +7239,9 @@ function(dir, localOnly = FALSE, pkgSize = NA)
         if(inherits(cfmt, "condition"))
             out$citation_problem_when_formatting <-
                 conditionMessage(cfmt)
+
         out
     }
-
     if(file.exists(cfile <- file.path(dir, "inst", "CITATION"))) {
         cinfo <- .check_citation_for_CRAN(cfile, meta)
         if(length(cinfo))
@@ -7434,9 +7429,9 @@ function(dir, localOnly = FALSE, pkgSize = NA)
             out$R_files_set_random_seed <- basename(fp)
     }
 
-    if(!is.na(size <- as.numeric(pkgSize)) &&
-       size > as.numeric(Sys.getenv("_R_CHECK_CRAN_INCOMING_TARBALL_THRESHOLD_",
-                                    unset = "5e6")))
+    size <- Sys.getenv("_R_CHECK_SIZE_OF_TARBALL_",
+                       unset = NA_character_)
+    if(!is.na(size) && (as.integer(size) > 5000000))
         out$size_of_tarball <- size
 
     ## Check URLs.

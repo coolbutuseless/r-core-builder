@@ -145,8 +145,6 @@ fixfiles: Rpwd.exe
 ifdef USE_LIBCURL
 	@if test -f "$(CURL_PATH)/etc/curl-ca-bundle.crt"; then \
 	  $(CP) -p "$(CURL_PATH)/etc/curl-ca-bundle.crt" ../../etc; \
-	elif test -f "$(CURL_CA_BUNDLE)"; then \
-	  $(CP) -p "$(CURL_CA_BUNDLE)" ../../etc/curl-ca-bundle.crt; \
 	fi
 endif
 
@@ -250,13 +248,7 @@ pkgclean-%:
 
 EXTRA_DIRS = blas graphapp intl tre trio tzone xdr win_iconv
 
-cleaninstaller:
-	-$(MAKE) -C installer clean
-
-# The installer has to be cleaned first, because cleaning it depends on Rscript
-#   clean0 and cleanwin0 exclude the installer
-#   clean, distclean and cleanwin clean also the installer 
-clean0: cleanwin0
+clean: cleanwin
 	@$(MAKE) -C ../library -f Makefile.win clean
 	$(RM) -f ../*/*.o ../*/*.a *.a ../*/*.d ../*/Makedeps fixed/fixdesc
 	@for d in $(EXTRA_DIRS); do \
@@ -269,12 +261,7 @@ clean0: cleanwin0
 	-$(MK) -C ../library/Recommended -f Makefile.win clean
 	$(RM) -f ../library/methods/all.R ../../etc/curl-ca-bundle.crt
 
-clean: cleaninstaller clean0
-
-distcleaninstaller:
-	-$(MAKE) -C installer distclean 
-
-distclean: cleaninstaller distcleaninstaller clean0
+distclean: clean
 	@for d in $(EXTRA_DIRS); do \
 	  $(MAKE) -C ../extra/$${d} -f Makefile.win distclean; \
 	done
@@ -297,8 +284,7 @@ distclean: cleaninstaller distcleaninstaller clean0
 	$(RM) ../../doc/html/index.html \
 	../../doc/html/packages.html ../../doc/html/rwin.html \
 	../../doc/html/rw-FAQ.html ../../doc/html/NEWS.html \
-	../../doc/NEWS.rds ../../doc/NEWS.3.rds ../../doc/NEWS.2.rds \
-	../../doc/NEWS ../../doc/NEWS.pdf \
+	../../doc/NEWS.rds ../../doc/NEWS ../../doc/NEWS.pdf \
 	../../doc/CHANGES.rds ../../doc/html/CHANGES.html
 	$(RM) ../../etc/Makeconf ../../etc/Rconsole ../../etc/Rdevga \
 	../../etc/Rprofile.site ../../etc/rgb.txt ../../etc/Rcmd_environ \
@@ -307,6 +293,7 @@ distclean: cleaninstaller distcleaninstaller clean0
 	$(RM) -R ../../share/zoneinfo
 	$(MAKE) -C fixed distclean
 	$(MAKE) -C ../include -f Makefile.win distclean
+	-$(MAKE) -C installer distclean
 	@for pkg in $(R_PKGS_BASE) translations; do \
 	  $(RM) ../library/$${pkg}/DESCRIPTION; \
 	done
@@ -322,15 +309,14 @@ veryclean: distclean
 	  ../../doc/html/resources.html ../../doc/html/NEWS.html \
 	  ../../SVN-REVISION # not in SVN sources
 
-cleanwin0: MkRules fixfiles
+cleanwin: MkRules fixfiles
 	$(RM) *.o *.dll *.a *~ \#*\# .RData .Rhistory Makedeps *.d
 	$(MAKE) -C ../extra/graphapp -f Makefile.win clean
 	$(MAKE) -C fixed clean
 	$(MAKE) -C getline clean
 	$(MAKE) -C front-ends clean
 	$(MAKE) -C ../library/grDevices/src/cairo -f Makefile.win clean WIN=$(WIN)
-
-cleanwin: cleaninstaller cleanwin0
+	-$(MAKE) -C installer clean
 
 
 #                          ===== testing ======

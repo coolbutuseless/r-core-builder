@@ -1,7 +1,7 @@
 /*
  *  R : A Computer Language for Statistical Data Analysis
  *  Copyright (C) 1995, 1996  Robert Gentleman and Ross Ihaka
- *  Copyright (C) 1998-2020   The R Core Team.
+ *  Copyright (C) 1998-2019   The R Core Team.
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -702,47 +702,32 @@ SEXP attribute_hidden do_sys(SEXP call, SEXP op, SEXP args, SEXP rho)
 
 SEXP attribute_hidden do_parentframe(SEXP call, SEXP op, SEXP args, SEXP rho)
 {
-    checkArity(op, args);
+    int n;
+    SEXP t;
+    RCNTXT *cptr;
 
-    int n = asInteger(CAR(args));
+    checkArity(op, args);
+    t = CAR(args);
+    n = asInteger(t);
+
     if(n == NA_INTEGER || n < 1 )
 	error(_("invalid '%s' value"), "n");
 
-    RCNTXT *cptr = R_findParentContext(R_GlobalContext, n);
-
-    if (cptr)
-	return cptr->sysparent;
-    else
-	return R_GlobalEnv;
-}
-
-/* R_findExecContext - Find a context frame older than `cptr` that has
-   `envir` as execution environment (the `cloenv` field). */
-attribute_hidden
-RCNTXT *R_findExecContext(RCNTXT *cptr, SEXP envir)
-{
-    while (cptr->nextcontext != NULL) {
-	if ((cptr->callflag & CTXT_FUNCTION) != 0 && cptr->cloenv == envir)
-	    return cptr;
+    cptr = R_GlobalContext;
+    t = cptr->sysparent;
+    while (cptr->nextcontext != NULL){
+	if (cptr->callflag & CTXT_FUNCTION ) {
+	    if (cptr->cloenv == t)
+	    {
+		if (n == 1)
+		    return cptr->sysparent;
+		n--;
+		t = cptr->sysparent;
+	    }
+	}
 	cptr = cptr->nextcontext;
     }
-    return NULL;
-}
-
-/* R_findParentContext - Find a context frame older than `cptr` whose
-   execution environment (`cloenv` field) is the same as cptr's
-   calling environment (`sysparent` field). In other words, find the
-   frame where `cptr->syscall` was (seemingly) called. This algorithm
-   powers `parent.frame()`. */
-attribute_hidden
-RCNTXT *R_findParentContext(RCNTXT *cptr, int n)
-{
-    while ((cptr = R_findExecContext(cptr, cptr->sysparent)) != NULL) {
-	if (n == 1)
-	    return cptr;
-	n--;
-    }
-    return NULL;
+    return R_GlobalEnv;
 }
 
 /* R_ToplevelExec - call fun(data) within a top level context to
@@ -828,7 +813,7 @@ protectedEval(void *d)
 	env = data->env;
     }
     data->val = eval(data->expression, env);
-    R_PreserveObject(data->val);
+    PROTECT(data->val);
 }
 
 SEXP
@@ -848,7 +833,7 @@ R_tryEval(SEXP e, SEXP env, int *ErrorOccurred)
     if (ok == FALSE)
 	data.val = NULL;
     else
-	R_ReleaseObject(data.val);
+	UNPROTECT(1);
 
     return(data.val);
 }
@@ -880,11 +865,10 @@ SEXP R_ExecWithCleanup(SEXP (*fun)(void *), void *data,
     cntxt.cend = cleanfun;
     cntxt.cenddata = cleandata;
 
-    PROTECT(result = fun(data));
+    result = fun(data);
     cleanfun(cleandata);
-    endcontext(&cntxt);
-    UNPROTECT(1);
 
+    endcontext(&cntxt);
     return result;
 }
 

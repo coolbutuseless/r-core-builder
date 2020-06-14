@@ -26,10 +26,9 @@
 
 ## <entry>
 ## Defunct in 3.0.0
-## Removed in 4.1.0
-## traceOn <- function(what, tracer = browseAll, exit = NULL) {
-##     browseAll <- function() .Defunct()
-##     .Defunct("trace")
-## }
-## traceOff <- function(whatL) .Defunct("untrace")
+traceOn <- function(what, tracer = browseAll, exit = NULL) {
+    browseAll <- function() .Defunct()
+    .Defunct("trace")
+}
+traceOff <- function(whatL) .Defunct("untrace")
 ## </entry>

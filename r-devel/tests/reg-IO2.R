@@ -1,7 +1,7 @@
 ## tests of boundary cases in read.table()
 
 ## force standard handling for character cols
-options(stringsAsFactors=FALSE) # R >= 4.0.0
+options(stringsAsFactors=TRUE)
 
 # empty file
 file.create("foo1")
@@ -51,7 +51,7 @@ cat("A B C D E F\n",
     "2 NA NA NA NA NA NA\n",
     "3 1 2 3 NA TRUE def\n",
     sep = "", file = "foo7")
-(res <- read.table("foo7", stringsAsFactors=TRUE))
+(res <- read.table("foo7"))
 sapply(res, typeof)
 sapply(res, class)
 (res2 <- read.table("foo7",

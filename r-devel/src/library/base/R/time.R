@@ -33,6 +33,10 @@ system.time <- function(expr, gcFirst = TRUE)
     on.exit()
     structure(new.time - time, class="proc_time")
 }
+unix.time <- function(...) {
+    .Deprecated("system.time")
+    system.time(...)
+}
 
 date <- function() .Internal(date())
 

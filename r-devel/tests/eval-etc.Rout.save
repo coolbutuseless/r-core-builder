@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2020-05-08 r78391) -- "Unsuffered Consequences"
+R Under development (unstable) (2020-03-03 r77897) -- "Unsuffered Consequences"
 Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -209,8 +209,7 @@ Levels: a b <NA>
 > ## partly failed in R 3.4.0 alpha
 > rm(CO) # as its deparse() depends on if utils was installed w/ keep.source.pkgs=TRUE
 > 
-> srcdir <- file.path(Sys.getenv("SRCDIR"), "eval-fns.R")
-> source(if(file.exists(srcdir)) srcdir else "./eval-fns.R", echo = TRUE)
+> source(file.path(Sys.getenv("SRCDIR"), "eval-fns.R"), echo = TRUE)
 
 > pd0 <- function(expr, backtick = TRUE, ...) parse(text = deparse(expr, 
 +     backtick = backtick, ...))
@@ -240,7 +239,7 @@ Levels: a b <NA>
 +     stopifnot(is.environment(env))
 +     for (nm in ls(envir = env)) {
 +         cat(nm, ": ", sep = .... [TRUNCATED] 
-> rm("srcdir")
+>                                         #---------
 > 
 > library(stats)
 > ## some more "critical" cases
@@ -992,13 +991,13 @@ Warning messages:
 > 
 > summary(warnings())
 Summary of (a total of 10) warning messages:
-4x : In dput(x, control = control) : deparse may be incomplete
-6x : In deparse(expr, backtick = backtick, ...) : deparse may be incomplete
+6x : In dput(x, control = control) : deparse may be incomplete
+4x : In deparse(expr, backtick = backtick, ...) : deparse may be incomplete
 > ## "dput    may be incomplete"
 > ## "deparse may be incomplete"
 > 
 > 
 > ## at the very end
 > cat('Time elapsed: ', proc.time() - .proctime00,'\n')
-Time elapsed:  0.346 0.019 0.371 0 0 
+Time elapsed:  0.349 0.021 0.382 0 0 
 > 

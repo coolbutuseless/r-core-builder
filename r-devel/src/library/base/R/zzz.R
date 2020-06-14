@@ -28,13 +28,12 @@ is.name <- is.symbol
     baseGenerics <- c("Math", "Ops", "Summary", "Complex",
         "as.character", "as.data.frame", "as.environment", "as.matrix", "as.vector",
         "cbind", "labels", "print", "rbind", "rep", "seq", "seq.int",
-        "plot", "sequence", "solve", "summary", "t")
+        "sequence", "solve", "summary", "t")
 
     utilsGenerics <- c("edit", "str")
 
     graphicsGenerics <- c("contour", "hist", "identify", "image",
-        ## "plot", 
-        "lines", "pairs", "points", "text")
+        "lines", "pairs", "plot", "points", "text")
 
     statsGenerics <- c("add1", "AIC", "anova", "biplot", "coef",
         "confint", "deviance", "df.residual", "drop1", "extractAIC",
@@ -408,7 +407,6 @@ matrix(c("!", "hexmode",
          "as.list", "POSIXlt",
          "as.list", "data.frame",
          "as.list", "default",
-         "as.list", "difftime",
          "as.list", "environment",
          "as.list", "factor",
          "as.list", "function",

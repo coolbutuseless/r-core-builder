@@ -1301,8 +1301,6 @@ SEXP R_syscall(int,RCNTXT*);
 int R_sysparent(int,RCNTXT*);
 SEXP R_sysframe(int,RCNTXT*);
 SEXP R_sysfunction(int,RCNTXT*);
-RCNTXT *R_findExecContext(RCNTXT *, SEXP);
-RCNTXT *R_findParentContext(RCNTXT *, int);
 
 void R_run_onexits(RCNTXT *);
 void NORET R_jumpctxt(RCNTXT *, int, SEXP);
@@ -1346,8 +1344,6 @@ const char *EncodeString(SEXP, int, int, Rprt_adj);
 const char *EncodeReal2(double, int, int, int);
 const char *EncodeChar(SEXP);
 
-/* main/raw.c */
-int mbrtoint(int *w, const char *s);
 
 /* main/sort.c */
 void orderVector1(int *indx, int n, SEXP key, Rboolean nalast,
@@ -1370,11 +1366,11 @@ int Rf_AdobeSymbol2ucs2(int n);
 double R_strtod5(const char *str, char **endptr, char dec,
 		 Rboolean NA, int exact);
 
-typedef unsigned short R_ucs2_t;
-size_t mbcsToUcs2(const char *in, R_ucs2_t *out, int nout, int enc);
+typedef unsigned short ucs2_t;
+size_t mbcsToUcs2(const char *in, ucs2_t *out, int nout, int enc);
 /* size_t mbcsMblen(char *in);
-size_t ucs2ToMbcs(R_ucs2_t *in, char *out);
-size_t ucs2Mblen(R_ucs2_t *in); */
+size_t ucs2ToMbcs(ucs2_t *in, char *out);
+size_t ucs2Mblen(ucs2_t *in); */
 size_t utf8toucs(wchar_t *wc, const char *s);
 size_t utf8towcs(wchar_t *wc, const char *s, size_t n);
 size_t ucstomb(char *s, const unsigned int wc);

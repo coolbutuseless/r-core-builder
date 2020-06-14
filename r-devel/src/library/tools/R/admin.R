@@ -148,8 +148,7 @@ function(db, verbose = FALSE)
         ## several packages have 'Depends: R', which is a noop.
         if(verbose && length(Rdeps) == 1L)
              message("WARNING: omitting pointless dependence on 'R' without a version requirement")
-        if(length(Rdeps) <= 1L)
-            Rdeps2 <- Rdeps <- NULL
+        if(length(Rdeps) <= 1L) Rdeps <- NULL
     } else Rdeps2 <- Rdeps <- NULL
     Rdeps <- as.vector(Rdeps)
     Suggests <- .split_dependencies(db[names(db) %in% "Suggests"])

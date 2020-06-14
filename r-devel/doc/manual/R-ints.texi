@@ -4209,12 +4209,7 @@ for the rationale of this check (and why even @option{-Werror} is
 unsafe).  Environment variable @env{_R_CHECK_COMPILATION_FLAGS_KNOWN_}
 can be set to a space-separated set of flags which come from the @R{}
 build used for testing (flags such as @option{-Wall} and
-@option{-Wextra} are already known).  For example, for  CRAN build of 
-@R{} >= 4.0.0 on macOS one could use
-@example
-_R_CHECK_COMPILATION_FLAGS_KNOWN_="-mmacosx-version-min=10.13" 
-@end example
-@noindent
+@option{-Wextra} are already known).
 Default: false (but true for CRAN submission checks).
 
 @item _R_CHECK_R_DEPENDS_
@@ -4354,16 +4349,6 @@ A positive integer.  If set, give a NOTE if the number of imports from
 non-base packages exceed this threshold.  Large numbers of imports
 make a package vulnerable to any of them becoming unavailable.
 Default: unset (but 20 for CRAN submission checks)
-
-@item _R_CHECK_DONTTEST_EXAMPLES_
-If true and examples are found with @code{\donttest} sections, the
-tests are run in one pass with these commented out and then in a
-second pass including the @code{\donttest} sections, (for the main
-architecture only).  Only for the first pass are the results compared
-to any @file{.Rout.save} file and timings analysed.  Overridden by
-@option{--run-donttest}.
-Default: false unless @option{-as-cran} is specified (which can be
-overridden by setting @samp{_R_CHECK_DONTTEST_EXAMPLES_=false}).
 @end vtable
 
 CRAN's submission checks use something like
@@ -4833,4 +4818,5 @@ gigabytes), many cores and a multi-threaded @acronym{BLAS}.
 
 @c Local Variables: ***
 @c mode: TeXinfo ***
+@c TeX-master: t
 @c End: ***

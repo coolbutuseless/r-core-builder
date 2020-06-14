@@ -1,5 +1,5 @@
 
-R Under development (unstable) (2020-04-28 r78322) -- "Unsuffered Consequences"
+R Under development (unstable) (2020-03-03 r77889) -- "Unsuffered Consequences"
 Copyright (C) 2020 The R Foundation for Statistical Computing
 Platform: x86_64-pc-linux-gnu (64-bit)
 
@@ -1650,11 +1650,9 @@ attr(,"gradient")
  [9,]    1 -0.0036328431  2.3469622  6.7835933
 [10,]    1 -0.0006683898  0.5619310  1.6833949
 [11,]    1 -0.0002589123  0.2459116  0.7486834
-> ## IGNORE_RDIFF_BEGIN
 > getInitial(weight ~ SSweibull(Time, Asym, Drop, lrc, pwr), data = Chick.6)
       Asym       Drop        lrc        pwr 
 158.501204 110.997081  -5.993421   2.646141 
-> ## IGNORE_RDIFF_END
 > ## Initial values are in fact the converged values
 > fm1 <- nls(weight ~ SSweibull(Time, Asym, Drop, lrc, pwr), data = Chick.6)
 > summary(fm1)
@@ -3926,7 +3924,7 @@ sigma^2 estimated as 0.4566:  log likelihood = -101.2,  aic = 212.4
 > 
 > asOneSidedFormula("age")
 ~age
-<environment: 0x3f10fc0>
+<environment: 0x5175d20>
 > asOneSidedFormula(~ age)
 ~age
 > 
@@ -4963,7 +4961,7 @@ function (V)
     r[cbind(1L:p, 1L:p)] <- 1
     r
 }
-<bytecode: 0x4e8efb0>
+<bytecode: 0x5eb6a18>
 <environment: namespace:stats>
 > stopifnot(all.equal(Cl, cov2cor(cov(longley))),
 +           all.equal(cor(longley, method = "kendall"),
@@ -7587,7 +7585,7 @@ attr(,".Environment")
 > environment(as.formula("y ~ x"))
 <environment: R_GlobalEnv>
 > environment(as.formula("y ~ x", env = new.env()))
-<environment: 0x4cabf38>
+<environment: 0x5bc7900>
 > 
 > 
 > ## Create a formula for a model with a large number of variables:
@@ -8378,7 +8376,7 @@ Libya          0.53_*
 > ## The 'infl' argument is not needed, but avoids recomputation:
 > rs <- rstandard(lm.SR)
 > iflSR <- influence(lm.SR)
-> all.equal(rs, rstandard(lm.SR, infl = iflSR), tol = 1e-10)
+> identical(rs, rstandard(lm.SR, infl = iflSR))
 [1] TRUE
 > ## to "see" the larger values:
 > 1000 * round(dfbetas(lm.SR, infl = iflSR), 3)
@@ -12281,14 +12279,14 @@ attr(,"class")
 $linkfun
 function (mu) 
 mu^lambda
-<bytecode: 0x288be68>
-<environment: 0x2876ac8>
+<bytecode: 0x4c79a70>
+<environment: 0x4c822f8>
 
 $linkinv
 function (eta) 
 pmax(eta^(1/lambda), .Machine$double.eps)
-<bytecode: 0x288c028>
-<environment: 0x2876ac8>
+<bytecode: 0x4c79920>
+<environment: 0x4c822f8>
 
 > 
 > 
@@ -12821,8 +12819,7 @@ Cumulative Proportion  0.4173 0.6498 0.7569
 > ### ** Examples
 > 
 > ## Don't show: 
-> old <- Sys.getlocale("LC_COLLATE")
->        invisible(Sys.setlocale("LC_COLLATE", "C"))
+> old <- Sys.setlocale("LC_COLLATE", "C")
 > ## End(Don't show)
 > require(utils)
 > 
@@ -12913,7 +12910,7 @@ predict.smooth.spline.fit :
 	 function (object, x, deriv = 0, ...)  NULL 
 > ## IGNORE_RDIFF_END
 > ## Don't show: 
-> invisible(Sys.setlocale("LC_COLLATE", old))
+> old <- Sys.setlocale("LC_COLLATE", old)
 > ## End(Don't show)
 > 
 > 
@@ -16498,8 +16495,8 @@ Step function with continuity 'f'= 0.2 ,  3 knots at
 > unclass(sfun0)
 function (v) 
 .approxfun(x, y, v, method, yleft, yright, f, na.rm)
-<bytecode: 0x5a4c4c8>
-<environment: 0x38fad28>
+<bytecode: 0x45afd60>
+<environment: 0x59a1600>
 attr(,"call")
 stepfun(1:3, y0, f = 0)
 > ls(envir = environment(sfun0))
@@ -18908,7 +18905,7 @@ Number of Fisher Scoring iterations: 6
 > cleanEx()
 > options(digits = 7L)
 > base::cat("Time elapsed: ", proc.time() - base::get("ptime", pos = 'CheckExEnv'),"\n")
-Time elapsed:  7.28 0.193 7.519 0 0 
+Time elapsed:  7.231 0.209 7.548 0 0 
 > grDevices::dev.off()
 null device 
           1 

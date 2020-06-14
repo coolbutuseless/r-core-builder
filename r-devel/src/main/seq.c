@@ -350,9 +350,6 @@ SEXP attribute_hidden do_rep_int(SEXP call, SEXP op, SEXP args, SEXP rho)
     if (DispatchOrEval(call, op, "rep.int", args, rho, &a, 0, 0))
       return(a);
 
-    if (DispatchOrEval(call, op, "rep", args, rho, &a, 0, 0))
-      return(a);
-    
     if (!isVector(ncopy))
 	error(_("invalid type (%s) for '%s' (must be a vector)"),
 	      type2char(TYPEOF(ncopy)), "times");
@@ -416,19 +413,6 @@ SEXP attribute_hidden do_rep_len(SEXP call, SEXP op, SEXP args, SEXP rho)
 
     s = CAR(args);
 
-    if (isObject(s)) {
-	SEXP rep_call;
-	PROTECT(rep_call = shallow_duplicate(call));
-	SETCAR(rep_call, install("rep"));
-	SET_TAG(CDDR(rep_call), install("length.out"));
-	SET_TAG(CDR(args), install("length.out"));
-	if (DispatchOrEval(rep_call, op, "rep", args, rho, &a, 0, 0)) {
-	    UNPROTECT(1);
-	    return(a);
-	}
-	UNPROTECT(1);
-    }
-    
     if (!isVector(s) && s != R_NilValue)
 	error(_("attempt to replicate non-vector"));
 
@@ -978,10 +962,9 @@ SEXP attribute_hidden do_seq(SEXP call, SEXP op, SEXP args, SEXP rho)
 	if(!R_FINITE(rfrom)) errorcall(call, _("'%s' must be a finite number"), "from");
 	if(!R_FINITE(rby))   errorcall(call, _("'%s' must be a finite number"), "by");
 	rto = rfrom + (double)(lout-1)*rby;
-	// avoid undefined behaviour by testing range before converting.
-	if(rfrom <= INT_MAX && rfrom >= INT_MIN
-	   &&  rto  <= INT_MAX &&  rto  >= INT_MIN
-	   && rby == (int)rby && rfrom == (int)rfrom) {
+	if(rby == (int)rby && rfrom == (int)rfrom
+	   && rfrom <= INT_MAX && rfrom >= INT_MIN
+	   &&  rto  <= INT_MAX &&  rto  >= INT_MIN) {
 	    ans = allocVector(INTSXP, lout);
 	    for(i = 0; i < lout; i++) {
 //		if ((i+1) % NINTERRUPT == 0) R_CheckUserInterrupt();

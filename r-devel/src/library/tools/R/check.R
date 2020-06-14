@@ -668,7 +668,7 @@ add_dummies <- function(dir, Log)
         ## see e.g.
         ## http://msdn.microsoft.com/library/default.asp?url=/library/en-us/fileio/fs/naming_a_file.asp
         ## http://msdn.microsoft.com/en-us/library/aa365247%28VS.85%29.aspx#naming_conventions
-        ## and https://en.wikipedia.org/wiki/Filename (which as of
+        ## and http://en.wikipedia.org/wiki/Filename (which as of
         ## 2007-04-22 is wrong about claiming that COM0 and LPT0 are
         ## disallowed):
         ##
@@ -1713,7 +1713,7 @@ add_dummies <- function(dir, Log)
                                 warning = function(e) {
                                     .warnings <<- c(.warnings,
                                                     conditionMessage(e))
-                                    tryInvokeRestart("muffleWarning")
+                                    invokeRestart("muffleWarning")
                                 })
             msg <- c(.warnings, .error)
             if(length(msg)) {
@@ -2711,12 +2711,7 @@ add_dummies <- function(dir, Log)
                       "Package has no Sweave vignette sources and no VignetteBuilder field.\n")
         }
 
-        libpaths <- .libPaths()
-        if(do_install)
-            .libPaths(c(libdir, libpaths))
         vigns <- pkgVignettes(dir = pkgdir, check = TRUE)
-        if(do_install)
-            .libPaths(libpaths)
         if(length(msg <- vigns[["msg"]])) {
             if(!any) noteLog(Log)
             any <- TRUE
@@ -3382,21 +3377,15 @@ add_dummies <- function(dir, Log)
                              tokens, useBytes = TRUE, value = TRUE)
                 machs <- grep("^[-]m", tokens,
                               value = TRUE, perl = TRUE, useBytes = TRUE)
-                ## The only -m flag which is reasonably portable is
-                ## -mtune and even that is debatable as it currently
-                ## does nothing and may be removed on clang.
+                ## The only -m flag which is reasonably portable is -mtune
                 machs <- setdiff(machs,
                                  c(except, c("-m", # not a flag
                                              "-msse2", "-mfpmath=sse", # SAFE_FFLAGS
-                                             "-mstackrealign", # SAFE_* / Windows EOPTS
                                              "-m32", # BRugs
                                              "-m64", # RcppParallel
                                              "-multiply_defined" # macOS
                                              )))
                 machs <- machs[!startsWith(machs, "-mtune=")]
-                ## This should only appear on macOS!
-                if(grepl('darwin', R.version$platform))
-                    machs <- machs[!startsWith(machs, "-mmacosx-")]  # macOS target flags
                 warns <- c(warns, diags, opts, machs)
                 if(any(startsWith(warns, "-Wno-")) || length(diags)) {
                     warningLog(Log)
@@ -3675,7 +3664,7 @@ add_dummies <- function(dir, Log)
 
     run_examples <- function()
     {
-        run_one_arch <- function(exfile, exout, arch = "", do_diff = TRUE)
+        run_one_arch <- function(exfile, exout, arch = "")
         {
             any <- FALSE
             ## moved here to avoid WARNING + OK
@@ -3698,7 +3687,6 @@ add_dummies <- function(dir, Log)
                               stdout = exout, stderr = exout,
                               stdin = exfile, arch = arch, timeout = tlim)
             t2 <- proc.time()
-            print_time(t1, t2, Log)
             if (status) {
                 errorLog(Log, "Running examples in ",
                          sQuote(basename(exfile)),
@@ -3729,6 +3717,7 @@ add_dummies <- function(dir, Log)
                 return(FALSE)
             }
 
+            print_time(t1, t2, Log)
             ## Look at the output from running the examples.  For
             ## the time being, report warnings about use of
             ## deprecated , as the next release will make
@@ -3794,10 +3783,10 @@ add_dummies <- function(dir, Log)
             }
             any <- any || bad
 
-            if (!any && !(check_incoming && do_timings && do_diff))
+            if (!any && !(check_incoming && do_timings))
                 resultLog(Log, "OK")
 
-            if (do_timings && do_diff) { ## do_diff = false is for re-running
+            if (do_timings) {
                 theta <-
                     as.numeric(Sys.getenv("_R_CHECK_EXAMPLE_TIMING_THRESHOLD_",
                                           "5"))
@@ -3853,7 +3842,7 @@ add_dummies <- function(dir, Log)
             ## a saved previous version.
             exsave <- file.path(pkgdir, test_dir, "Examples",
                                 paste0(pkgname, "-Ex.Rout.save"))
-            if (do_diff && file.exists(exsave)) {
+            if (file.exists(exsave)) {
                 checkingLog(Log, "differences from ",
                             sQuote(basename(exout)),
                             " to ", sQuote(basename(exsave)))
@@ -3930,34 +3919,7 @@ add_dummies <- function(dir, Log)
                 cntFile <- paste0(exfile, "-cnt")
                 if (file.exists(cntFile)) {
                     unlink(cntFile)
-                    x <- Sys.getenv("_R_CHECK_DONTTEST_EXAMPLES_", "NA")
-                    test_donttest <- !run_donttest &&
-                        (if (x == "NA") as_cran else config_val_to_logical(x))
-                    if (test_donttest) {
-                        checkingLog(Log, "examples with --run-donttest")
-                        cmd <- sprintf('tools:::.createExdotR("%s", "%s", silent = TRUE, use_gct = %s, addTiming = %s, commentDontrun = %s, commentDonttest = %s)',
-                                       pkgname, pkgtopdir, use_gct, do_timings,
-                                       !run_dontrun, FALSE)
-                        Rout <- tempfile("Rout")
-                        ## any arch will do here
-                        status <- R_runR0(cmd, R_opts2, "LC_ALL=C",
-                                          stdout = Rout, stderr = Rout)
-                        exfile <- paste0(pkgname, "-Ex.R")
-                        if (status) {
-                            errorLog(Log,
-                                     paste("Running massageExamples to create",
-                                           sQuote(exfile), "failed"))
-                            printLog0(Log,
-                                      paste(readLines(Rout, warn = FALSE),
-                                            collapse = "\n"),
-                                      "\n")
-                            maybe_exit(1L)
-                        }
-                        exout <- paste0(pkgname, "-Ex.Rout")
-                        if(!run_one_arch(exfile, exout, do_diff = FALSE))
-                            maybe_exit(1L)
-                    }
-                    else if (as_cran)
+                    if (as_cran)
                         printLog(Log, "** found \\donttest examples:",
                                  " check also with --run-donttest\n")
                 }
@@ -4023,8 +3985,8 @@ add_dummies <- function(dir, Log)
                               stdout = "", stderr = "", arch = arch,
                               timeout = tlim)
             t2 <- proc.time()
-            print_time(t1, t2, Log)
             if (status) {
+                print_time(t1, t2, Log)
                 errorLog(Log)
                 if (Log$con > 0L && file.exists(logf)) {
                     ## write individual results only to 00check.log
@@ -4074,6 +4036,7 @@ add_dummies <- function(dir, Log)
                 }
                 return(FALSE)
             } else {
+                print_time(t1, t2, Log)
                 resultLog(Log, "OK")
                 if (Log$con > 0L && file.exists(logf)) {
                     ## write results only to 00check.log
@@ -4419,13 +4382,14 @@ add_dummies <- function(dir, Log)
                     }
                 }
                 t2 <- proc.time()
-                print_time(t1, t2, Log)
                 if(!ran) {
+                    print_time(t1, t2, Log)
                     resultLog(Log, "NONE")
                     ## printLog0(Log, out0)
                     if (!is.null(Log) && Log$con > 0L)
                         cat(out0, sep ="", file = Log$con)
                 } else {
+                    print_time(t1, t2, Log)
                     if(R_check_suppress_RandR_message)
                         res <- filtergrep('^Xlib: *extension "RANDR" missing on display',
                                           res, useBytes = TRUE)
@@ -4974,8 +4938,7 @@ add_dummies <- function(dir, Log)
                              ## new in gcc 8
                              ": warning: .* \\[-Wcatch-value=\\]",
                              ": warning: .* \\[-Wlto-type-mismatch\\]",
-                             ## removed 2020-05, nowadays clang only
-                             ## ": warning: .* \\[-Wunused-value\\]",
+                             ": warning: .* \\[-Wunused-value\\]",
                              ## warning in g++, fatal in clang++.
                              ": warning: .* \\[-Wnarrowing\\]",
                              ## -pedantic warning in gcc, fatal in clang and ODS
@@ -5021,15 +4984,12 @@ add_dummies <- function(dir, Log)
                              ": warning: .* \\[-Wtautological",  # also gcc
                              ": warning: .* \\[-Wincompatible-pointer-types\\]",
                              ": warning: format string contains '[\\]0'",
-                             ## Apple's clang warns about this even in C++11 mode
-                             ## ": warning: .* \\[-Wc[+][+]11-long-long\\]",
+                             ": warning: .* \\[-Wc[+][+]11-long-long\\]",
                              ": warning: empty macro arguments are a C99 feature",
                              ": warning: .* \\[-Winvalid-source-encoding\\]",
                              ": warning: .* \\[-Wunused-command-line-argument\\]",
                              ": warning: .* \\[-Wxor-used-as-pow\\]", # clang 10
                              ": warning: .* \\[-Winconsistent-missing-override\\]",
-                             ## also on gcc, but fewer warnings
-                             ": warning: .* \\[-Wlogical-not-parentheses\\]",
                              ## For non-portable flags (seen in sub-Makefiles)
                              "warning: .* \\[-Wunknown-warning-option\\]"
                              )
@@ -5043,8 +5003,8 @@ add_dummies <- function(dir, Log)
                 lines <- grep("exceeds maximum object size.*-W(alloc-size-larger-than|stringop-overflow)", lines,
                               value = TRUE, useBytes = TRUE, invert = TRUE)
 
-                ## Filter out boost/armadillo header warnings
-                ex_re <- "(BH/include/boost|RcppArmadillo/include/armadillo_bits)/.*\\[-Wtautological-overlap-compare\\]"
+                ## Filter out boost header warning
+                ex_re <- "BH/include/boost/.*\\[-Wtautological-overlap-compare\\]"
                 lines <- filtergrep(ex_re, lines, useBytes = TRUE)
 
                 ## and GNU extensions in system headers
@@ -5359,12 +5319,12 @@ add_dummies <- function(dir, Log)
         desc
     }
 
-    check_CRAN_incoming <- function(localOnly, pkgSize)
+    check_CRAN_incoming <- function(localOnly)
     {
         checkingLog(Log, "CRAN incoming feasibility")
-        res <- .check_package_CRAN_incoming(pkgdir, localOnly, pkgSize)
+        res <- .check_package_CRAN_incoming(pkgdir, localOnly)
+        bad <- FALSE
         if(length(res)) {
-            bad <- FALSE
             out <- format(res)
             if(length(out) == 1L && startsWith(out, "Maintainer: ")) {
                 ## Special-case when there is only the maintainer
@@ -6250,12 +6210,12 @@ add_dummies <- function(dir, Log)
                 summaryLog(Log)
                 do_exit(1L)
             }
-            pkg_size <- file.info(pkg)$size
+            size <- file.info(pkg)$size
+            Sys.setenv("_R_CHECK_SIZE_OF_TARBALL_" = size)
             ## this assumes foo_x.y.tar.gz unpacks to foo, but we are about
             ## to test that.
             pkg <- file.path(dir, pkgname0)
-        } else
-            pkg_size <- NA
+        }
         if (!dir.exists(pkg)) {
             checkingLog(Log, "package directory")
             errorLog(Log,
@@ -6303,9 +6263,11 @@ add_dummies <- function(dir, Log)
         else if (length(opts) == 1L)
             messageLog(Log, "using option ", sQuote(opts))
 
-        if(isTRUE(config_val_to_logical(Sys.getenv("_R_CHECK_NO_STOP_ON_TEST_ERROR_",
-                                                   "FALSE"))))
+        if(identical(config_val_to_logical(Sys.getenv("_R_CHECK_NO_STOP_ON_TEST_ERROR_",
+                                                      "FALSE")),
+                     TRUE)) {
             stop_on_test_error <- FALSE
+        }
 
         if (!nzchar(libdir)) { # otherwise have set R_LIBS above
             libdir <- pkgoutdir
@@ -6367,7 +6329,7 @@ add_dummies <- function(dir, Log)
             check_incoming_remote <- if(check_incoming_remote == "NA") as_cran else {
                 config_val_to_logical(check_incoming_remote)
             }
-            if (check_incoming) check_CRAN_incoming(!check_incoming_remote, pkg_size)
+            if (check_incoming) check_CRAN_incoming(!check_incoming_remote)
 
             ## <NOTE>
             ## We want to check for dependencies early, since missing
@@ -6533,12 +6495,7 @@ add_dummies <- function(dir, Log)
                           "Rdlatex.log",
                           "R_check_bin",
                           "build_vignettes.log",
-                          "tests", "vign_test",
-                          if(this_multiarch)
-                              c(paste0("examples_", inst_archs),
-                                paste0(pkgname, "-Ex_", inst_archs, ".Rout"),
-                                paste0("tests_", inst_archs))
-                          ))
+                          "tests", "vign_test"))
             ## Examples calling dev.new() give files Rplots*.pdf,
             ## building vignettes give *.log files: be nice ...
             things <- things[!grepl("^Rplots.*[.]pdf$|[.]log$", things)]

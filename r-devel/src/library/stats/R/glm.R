@@ -456,7 +456,6 @@ anova.glm <- function(object, ..., dispersion = NULL, test = NULL)
                        control=object$control))
       r <- fit$residuals
       w <- fit$weights
-      icpt <- attr(object$terms, "intercept")
     }
 
     ## if there is more than one explanatory variable then
@@ -472,7 +471,7 @@ anova.glm <- function(object, ..., dispersion = NULL, test = NULL)
             eta <- object$linear.predictors
             y <- object$fitted.values + object$residuals * mu.eta(eta)
         }
-	for(i in seq_len(max(nvars - 1L, 0))) { # nvars == 0 can happen
+	for(i in seq_len(nvars-1L)) {
 	    ## explanatory variables up to i are kept in the model
 	    ## use method from glm to find residual deviance
 	    ## and df for each sequential fit
@@ -488,8 +487,7 @@ anova.glm <- function(object, ..., dispersion = NULL, test = NULL)
               zz <- eval(call(if(is.function(method)) "method" else method,
                              x=x[, varseq <= i, drop = FALSE],
                              y=r,
-                             weights=w,
-                             intercept=icpt))
+                             weights=w))
               score[i] <-  zz$null.deviance - zz$deviance
               r <- fit$residuals
               w <- fit$weights
@@ -501,8 +499,7 @@ anova.glm <- function(object, ..., dispersion = NULL, test = NULL)
           zz <- eval(call(if(is.function(method)) "method" else method,
                           x=x,
                           y=r,
-                          weights=w,
-                          intercept=icpt))
+                          weights=w))
           score[nvars] <- zz$null.deviance - zz$deviance
         }
     }
@@ -590,19 +587,17 @@ anova.glmlist <- function(object, ..., dispersion=NULL, test=NULL)
       df <- -diff(resdf)
 
       for (i in seq_len(nmodels-1)) {
-        m1 <- if (df[i] > 0) object[[i]] else object[[i+1]]
-        m2 <- if (df[i] > 0) object[[i+1]] else object[[i]]
+        m1 <- if (df[i]>0) object[[i]] else object[[i+1]]
+        m2 <- if (df[i]>0) object[[i+1]] else object[[i]]
         r <- m1$residuals
         w <- m1$weights
         method <- m2$method
-        icpt <- attr(m1$terms, "intercept")
         zz <- eval(call(if(is.function(method)) "method" else method,
                         x=model.matrix(m2),
                         y=r,
-                        weights=w,
-                        intercept=icpt))
+                        weights=w))
         score[i+1] <-  zz$null.deviance - zz$deviance
-        if (df[i] < 0) score[i+1] <- - score[i+1]
+        if (df < 0) score[i+1] <- - score[i+1]
       }
     }
 

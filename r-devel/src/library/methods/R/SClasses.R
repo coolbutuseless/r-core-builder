@@ -510,7 +510,7 @@ validObject <- function(object, test = FALSE, complete = FALSE)
 	    errors <- c(errors,
 			paste0("invalid object for slot \"", slotNames[[i]],
 			       "\" in class \"", Class,
-			       "\": got class \"", class(sloti)[[1L]],
+			       "\": got class \"", class(sloti),
 			       "\", should be or extend class \"", classi, "\""))
 	    next
 	}

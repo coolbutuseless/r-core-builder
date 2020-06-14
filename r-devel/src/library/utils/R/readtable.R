@@ -64,7 +64,7 @@ function(file, header = FALSE, sep = "", quote = "\"'", dec = ".",
          check.names = TRUE, fill = !blank.lines.skip,
          strip.white = FALSE, blank.lines.skip = TRUE,
          comment.char = "#", allowEscapes = FALSE, flush = FALSE,
-         stringsAsFactors = FALSE,
+         stringsAsFactors = default.stringsAsFactors(),
          fileEncoding = "", encoding = "unknown", text, skipNul = FALSE)
 {
     if (missing(file) && !missing(text)) {

@@ -538,18 +538,17 @@ stopifnot(is.null(attributes(body(g)[[3L]][[4L]])))
 
 ## pmin/pmax of ordered factors -- broken in R 3.3.2  [PR #17195]
 of <- ordered(c(1,5,6))
-asI <- as.integer # < shorter code
 set.seed(6); rof <- sample(of, 12, replace=TRUE)
 stopifnot(exprs = {
-    identical(pmax(rof, of), ordered(pmax(asI(rof), asI(of)), labels=levels(rof)) -> pmar)
+    identical(pmax(rof, of), ordered(pmax(c(rof), c(of)), labels=levels(rof)) -> pmar)
     identical(pmax(of, rof), pmar)
-    identical(pmin(rof, of), ordered(pmin(asI(rof), asI(of)), labels=levels(rof)) -> pmir)
+    identical(pmin(rof, of), ordered(pmin(c(rof), c(of)), labels=levels(rof)) -> pmir)
     identical(pmin(of, rof), pmir)
-    identical(pmin(rof, 5), ordered(pmin(asI(rof), 2), levels=1:3, labels=levels(rof)))
-    identical(pmax(rof, 6), ordered(pmax(asI(rof), 3), levels=1:3, labels=levels(rof)))
+    identical(pmin(rof, 5), ordered(pmin(c(rof), 2), levels=1:3, labels=levels(rof)))
+    identical(pmax(rof, 6), ordered(pmax(c(rof), 3), levels=1:3, labels=levels(rof)))
     identical(pmax(rof, 1), rof)
     identical(pmin(rof, 6), rof)
-    identical(pmax(of, 5, rof), ordered(pmax(asI(of),2L,asI(rof)), levels=1:3,
+    identical(pmax(of, 5, rof), ordered(pmax(c(of),2L,c(rof)), levels=1:3,
                                         labels=levels(of)))
 })
 ## these were "always" true .. but may change (FIXME ?)
@@ -3080,16 +3079,7 @@ stopifnot(exprs = {
     x[1:52] %% 3 == 2:1
    -x[1:52] %% 3 == 1:2
 }) # larger x suffer from cancellation (well, warning too early now):
-(iCrit <- ## depends on the presence and version of "long double":
-    if(noLdbl)
-        50:55
-    else if(is.integer(digLd <- .Machine$longdouble.digits) && digLd == 64)
-        60:68
-    else if(is.integer(digLd) && digLd == 113) ## aarch64 {PR#17718}
-        110:118
-    else 250:258 # "wild guess" should always work
-)
-tools::assertWarning(x[iCrit] %% 3, verbose=TRUE)
+tools::assertWarning(x[60:68] %% 3)
 
 
 ## Hilmar Berger's on R-devel list: 'data.frame() == NULL' etc
@@ -3107,32 +3097,6 @@ for(DF in list(d0., d0, d30., d30))
 	    dim(r) <= dim(DF) # sometimes r is <0 x 0> when DF is not
 	})
 ## many of these '==' calls failed in R <= 3.6.x
-
-
-## Can selectively suppress warnings
-w <- function(class) {
-    w <- simpleWarning("warned")
-    w <- structure(w, class = c(class, class(w)))
-    warning(w)
-}
-catch <- function(expr) tryCatch({ expr; FALSE }, warning = function(...) TRUE)
-stopifnot(! catch(suppressWarnings(w("foo"))))
-stopifnot(! catch(suppressWarnings(w("foo"), classes = c("bar", "foo"))))
-stopifnot(catch(suppressWarnings(w("foo"), classes = c("bar", "baz"))))
-rm(w, catch)
-
-
-## Can selectively suppress messages
-m <- function(class) {
-    m <- simpleMessage("notified")
-    m <- structure(m, class = c(class, class(m)))
-    message(m)
-}
-catch <- function(expr) tryCatch({ expr; FALSE }, message = function(...) TRUE)
-stopifnot(! catch(suppressMessages(m("foo"))))
-stopifnot(! catch(suppressMessages(m("foo"), classes = c("bar", "foo"))))
-stopifnot(catch(suppressMessages(m("foo"), classes = c("bar", "baz"))))
-rm(m, catch)
 
 
 ## grepl(<NA>, ...)
@@ -3266,10 +3230,7 @@ stopifnot(exprs = {
 
 ## improved error message from contour():
 tt <- tryCatch(contour(volcano, levels = c(20*c(4:6, -Inf, 8:10))), error=identity)
-print(tt)
-## The rest of this message is OS-dependent: gcc 5.x on Solaris has '= -Inf'
-## others have " = -inf"
-stopifnot(inherits(tt, "error"), grepl("non-finite level.*\\[4\\]", tt$message))
+stopifnot(inherits(tt, "error"), grepl("non-finite level.*\\[4\\] = -inf", tt$message))
 ## had "invalid NA contour values"
 
 
@@ -3597,7 +3558,6 @@ stopifnot(identical(w0[sel], w1[sel]), identical(w0[sel], wII[sel]))
 ## Inf-Inf  etc broken in paired case in R <= 3.6.x
 
 
-if(FALSE){ ## pro tem
 ## round(x, n) "to even" failed in some cases -- PR#17668
 dd <- 0:12
 x55 <- 55 + as.numeric(vapply(dd+1, function(k) paste0(".", strrep("5",k)), ""))
@@ -3678,7 +3638,7 @@ dr <- diff(rmm <- round(mm, 301:500))
 stopifnot(length(inz) == 1, dr[inz] == mm, dr[-inz] == 0,
           rmm[-(1:23)] == mm)
 options(op) ## in R <= 3.6.x, all(rmm == 0)
-}
+
 
 ## update.formula() triggering terms.formula() bug -- PR#16326
 mkF <- function(nw) as.formula(paste("y ~ x + x1",
@@ -3749,32 +3709,37 @@ stopifnot(identical(tools::assertError(sqrt("a")),
 
 
 ## Overriding encoding in parse()
-if (l10n_info()$"UTF-8" || l10n_info()$"Latin-1") {
-    x8 <- "'\uf6'"
-    x8.2 <- substr(x8, 2, 2)
-    stopifnot(identical(Encoding(x8), "UTF-8"))
-    f8 <- tempfile()
-    writeLines(x8, f8, useBytes=TRUE) # save in UTF-8
-    ##
-    chk_x82 <- function(x) stopifnot(identical(Encoding(x), "UTF-8"),
-                                     identical(x, x8.2))
-    ## parse(*, encoding = "UTF-8", ..) :
-    for(FF in c(function(.) parse(text=., encoding="UTF-8", keep.source=TRUE),
-                function(.) parse(text=., encoding="UTF-8", keep.source=FALSE)
-                )) {
-        x <- eval(FF(x8))
-        chk_x82(x)
-    }
-    for(K.S in c(TRUE, FALSE)) {
-        x <- eval(parse(file=f8, encoding="UTF-8", keep.source = K.S))
-        chk_x82(x)
-    }
-    ## latin1 <--> UTF-8
-    xl <- iconv(x8, from="UTF-8", to="latin1")
-    stopifnot(identical(Encoding(xl), "latin1"))
-    stopifnot(identical(x8, iconv(xl, from="latin1", to="UTF-8")))
-    unlist(l10n_info()) # to see ..
+oloc <- Sys.getlocale("LC_CTYPE")
+if (onWindows) {
+  Sys.setlocale("LC_CTYPE", "English_United States.1252")
+} else {
+  ## assumes non-Windows system already all support UTF-8
+  Sys.setlocale("LC_CTYPE", "en_US.UTF-8")
 }
+##
+x8 <- "'\uf6'"
+(x8.2 <- substr(x8, 2,2))
+stopifnot(identical(Encoding(x8), "UTF-8"))
+f8 <- tempfile()
+writeLines(x8, f8, useBytes=TRUE) # save in UTF-8
+##
+chk_x82 <- function(x) stopifnot(identical(Encoding(x), "UTF-8"), identical(x, x8.2))
+## parse(*, encoding = "UTF-8", ..) :
+for(FF in c(function(.) parse(text=., encoding="UTF-8", keep.source=TRUE),
+            function(.) parse(text=., encoding="UTF-8", keep.source=FALSE)
+            )) {
+    x <- eval(FF(x8))
+    chk_x82(x)
+}
+for(K.S in c(TRUE, FALSE)) {
+    x <- eval(parse(file=f8, encoding="UTF-8", keep.source = K.S))
+    chk_x82(x)
+}
+## latin1 <--> UTF-8
+xl <- iconv(x8, from="UTF-8", to="latin1")
+stopifnot(identical(Encoding(xl), "latin1"))
+stopifnot(identical(x8, iconv(xl, from="latin1", to="UTF-8")))
+unlist(l10n_info()) # to see ..
 if (l10n_info()$"UTF-8") {
     for(x in c(eval(parse(text=x8)),
                eval(parse(text=xl, keep.source=TRUE)),
@@ -3792,6 +3757,7 @@ if (l10n_info()$"Latin-1") {
                str2expression(x8)))
         stopifnot(identical(x, x8.2))
 }
+Sys.setlocale("LC_CTYPE", oloc)
 ## parse(text=xl) had failed w/ "EOF whilst reading MBCS char at line 2"
 
 
@@ -3831,8 +3797,7 @@ stopifnot(is.na( norm(diag(c(1, NA)), "2") ))
 ## norm(<matrix-w-NA>, "F")
 (m <- cbind(0, c(NA, 0), 0:-1))
 nTypes <- eval(formals(base::norm)$type) # "O" "I" "F" "M" "2"
-print( # stopifnot( -- for now, as Lapack is still broken in some OpenBLAS -- FIXME
-    is.na( print(vapply(nTypes, norm, 0., x = m)) )) # print(): show NA *or* NaN
+stopifnot(is.na( print(vapply(nTypes, norm, 0., x = m)) )) # print(): show NA *or* NaN
 ## "F" gave non-NA with LAPACK 3.9.0, before our patch in R-devel and R-patched
 
 
@@ -3854,137 +3819,13 @@ x <- 1 - 2^-51 ; dput(x, , "all")
 stopifnot(exprs = {
     identical(deparse(x), as.character(x))
     identical(deparse(x), "1") # default only uses 15 (= DBL_DIG) digits
-    if(!capabilities("long.double")) TRUE else
-        identical(x, as.numeric(deparse(x, control="all")))
+    identical(x, as.numeric(deparse(x, control="all")))
     identical(x, as.numeric(deparse(x, control="exact") -> dx.x))
     identical(print(dx.x),  deparse(x, control="hexNumeric"))
     TRUE || ## maybe not on all platforms ?
         identical(dx.x, "0x1.ffffffffffffcp-1") # on 32-bit, too
 })
 ## "all" gave "1" in R <= 3.6.z
-
-
-## Can suppress warnings with missing restarts
-cnd <- simpleWarning("foo")
-out <- tryCatch(suppressWarnings(stop(cnd)), warning = identity)
-stopifnot(identical(out, cnd))
-## Can suppress messages with missing restarts
-cnd <- simpleMessage("foo")
-out <- tryCatch(suppressMessages(stop(cnd)), message = identity)
-stopifnot(identical(out, cnd))
-
-
-## PR#17730 -- data() should no longer "lie" and warn {already have getOption("warn") == 2
-for(p in c("base", "stats")) {
-    dd <- data(package=p)
-    stopifnot(inherits(dd, "packageIQR"), is.list(dd),
-              nrow(dd$results) == 0)
-}
-## gave all data from pkg 'datasets'  *and* warned in  R <= 3.6.3
-
-
-## PR#17756: x[[Inf]] and also x[[ -i ]] ,  for i in (Inf, 1,2,...):
-obj <- list(
-    a = 1:3
-  , L3 = as.list(1:3)
-  , L  = list(a = 1:2)
-  , L2 = list(a = 1:2, b = 3:5)
-  , LL2 = list(a = list(a1=1:3, a2=letters[1:4]),
-               b = list(b1=10, b2=-(1:3)))
-    )
-obj$ LL3 <- c(obj$ LL2, list(c = list(c1= 7, c2= -11)))
-stopifnot( print(vapply(obj[-1], function(x) is.null(x[[Inf]]), NA)) )
-t_mInf <- lapply(obj, function(x) tryCid(x[[-Inf]]))
-getMsg <- function(tryClist) vapply(tryClist, conditionMessage, "..")
-stopifnot(length(print(table(msg_Inf <- getMsg(t_mInf)))) == 1)
-## in R <= 3.6.3:
-## attempt to select less than one element in get1index <real> : 1 x
-## attempt to select more than one element in get1index <real> : 5 x
-
-umInf <- unique(msg_Inf)
-str(t_m1 <- lapply(obj, function(x) tryCid(x[[-1]]))) # L2, LL2 "work" - why?
-    t_m2 <- lapply(obj, function(x) tryCid(x[[-2]]))  # L2, LL2 "work" - why?
-    t_m3 <- lapply(obj, function(x) tryCid(x[[-3]]))
-nonL2 <- grep("L2$", names(t_m1), value=TRUE, invert=TRUE)
-stopifnot(exprs = {
-    identical(getMsg(t_m3), msg_Inf)
-    identical(t_m2$L2, 1:2)
-    identical(t_m2$LL2, obj$LL2[[1]])
-    identical(getMsg(t_m1[nonL2]), msg_Inf[nonL2])
-    identical(getMsg(t_m2[nonL2]), msg_Inf[nonL2])
-})
-if(englishMsgs) { cat("checking (default = ) English error messages\n")
-    stopifnot(grepl("negative subscript", umInf))
-}
-##
-
-
-## paste(...,  recycle0=TRUE)  uses the "normal" 0-length recycling rule:
-##                                "if one argument has length zero, the result has too."
-ch0 <- character(0)
-stopifnot(exprs = {
-    ## a) when paste() has 0 '...' arguments :
-    identical(paste (), ch0)               ## collapse = NULL -----------
-    identical(paste0(), ch0)
-    identical(paste (collapse= "A"  ), "")
-    identical(paste0(collapse="foof"), "")
-    identical(paste (collapse= "A"  , recycle0 = TRUE), ch0)
-    identical(paste0(collapse="foof", recycle0 = TRUE), ch0)
-    ##
-    ## b) when all '...'  arguments have length 0 :
-    ## ---- collapse = NULL -------------
-    identical(paste({}),                     ch0)
-    identical(paste({}, recycle0 = TRUE), ch0)
-    identical(paste({}, NULL, ch0),                     ch0)
-    identical(paste({}, NULL, ch0, recycle0 = TRUE), ch0)
-    ## ---- collapse not NULL ---------
-    identical(paste({}, collapse=""),                      "")
-    identical(paste({}, collapse="", recycle0 = TRUE), ch0)
-    identical(paste({}, NULL, ch0, collapse=""),                      "")
-    identical(paste({}, NULL, ch0, collapse="", recycle0 = TRUE), ch0)
-    ##
-    ## c) when *one* of the ...-args has length 0 :
-    identical(paste ("foo", character(0), "bar", recycle0 = FALSE), "foo  bar")
-    identical(paste0("foo", character(0), "bar", recycle0 = FALSE), "foobar")
-    identical(paste ("foo", character(0), "bar", recycle0 = TRUE), ch0)
-    identical(paste0("foo", character(0), "bar", recycle0 = TRUE), ch0)
-})
-## 0-length recycling with default recycle0 = FALSE has always been "unusual"
-## -----------------  with     recycle0 = TRUE      returns 0-length i.e. character(0)
-
-
-## aov() formula deparsing  {Jan Hauffa, Apr 11, 2020, on R-devel}
-mkAov <- function(nms, n = 50) {
-    dflong <- as.data.frame(matrix(pi, n, length(nms),
-                                   dimnames = list(NULL, nms)))
-    forml <- as.formula(paste0("cbind(", paste(nms, collapse = ","), ") ~ 1 + Error(1)"))
-    aov(forml, data=dflong)
-}
-nLng <- paste0("someReallyLongVariableName", 1:20)
-cf1 <- coef(fm1 <- mkAov(vnms <- paste0("v", 1:20)))
-cfL <- coef(fmL <- mkAov(nLng)); colnames(cfL[[1]]) <- vnms
-stopifnot(all.equal(cf1, cfL))
-## mkAov(nLng)  failed in R <= 4.0.0
-
-
-## UTF8 validity checking internal in R (from PCRE, PR#17755)
-stopifnot(identical(validUTF8('\ud800'), FALSE))
-
-
-## summary.warnings()  -- reported by Allison Meisner, jhmi.edu
-testf <- function(x) {
-    if(x > 30)
-        warning("A big problem (should be 20 of these)")
-    else
-        warning("Bigger problem (should be 30 of these)")
-}
-op <- options(warn=0)
-for(i in 1:50) testf(i) # -> 50 warnings ..
-options(op)# reset
-(sw <- summary(warnings()))
-stopifnot(identical(unlist(lapply(names(sw), substr, 1, 6)), c("Bigger", "A big ")),
-          identical(attr(sw, "counts"), c(30L, 20L)))
-## was wrong (mis-sorted counts) in R <= 4.0.0
 
 
 
