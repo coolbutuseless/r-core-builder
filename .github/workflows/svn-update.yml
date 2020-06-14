@@ -1,0 +1,6 @@
+name: Update SVN snapshot
+
+on:
+  schedule:
+    # daily, 4 AM UTC
+    - cron:  '0 4 * * *'
