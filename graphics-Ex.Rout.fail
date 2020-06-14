@@ -1,0 +1,1011 @@
+
+R version 3.6.0 (2019-04-26) -- "Planting of a Tree"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+  Natural language support but running in an English locale
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> pkgname <- "graphics"
+> source(file.path(R.home("share"), "R", "examples-header.R"))
+> options(warn = 1)
+> library('graphics')
+> 
+> base::assign(".oldSearch", base::search(), pos = 'CheckExEnv')
+> base::assign(".old_wd", base::getwd(), pos = 'CheckExEnv')
+> cleanEx()
+> nameEx("abline")
+> ### * abline
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: abline
+> ### Title: Add Straight Lines to a Plot
+> ### Aliases: abline
+> ### Keywords: aplot
+> 
+> ### ** Examples
+> 
+> ## Setup up coordinate system (with x == y aspect ratio):
+> plot(c(-2,3), c(-1,5), type = "n", xlab = "x", ylab = "y", asp = 1)
+> ## the x- and y-axis, and an integer grid
+> abline(h = 0, v = 0, col = "gray60")
+> text(1,0, "abline( h = 0 )", col = "gray60", adj = c(0, -.1))
+> abline(h = -1:5, v = -2:3, col = "lightgray", lty = 3)
+> abline(a = 1, b = 2, col = 2)
+> text(1,3, "abline( 1, 2 )", col = 2, adj = c(-.1, -.1))
+> 
+> ## Simple Regression Lines:
+> require(stats)
+> sale5 <- c(6, 4, 9, 7, 6, 12, 8, 10, 9, 13)
+> plot(sale5)
+> abline(lsfit(1:10, sale5))
+> abline(lsfit(1:10, sale5, intercept = FALSE), col = 4) # less fitting
+> 
+> z <- lm(dist ~ speed, data = cars)
+> plot(cars)
+> abline(z) # equivalent to abline(reg = z) or
+> abline(coef = coef(z))
+> 
+> ## trivial intercept model
+> abline(mC <- lm(dist ~ 1, data = cars)) ## the same as
+> abline(a = coef(mC), b = 0, col = "blue")
+> 
+> 
+> 
+> cleanEx()
+> nameEx("arrows")
+> ### * arrows
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: arrows
+> ### Title: Add Arrows to a Plot
+> ### Aliases: arrows
+> ### Keywords: aplot
+> 
+> ### ** Examples
+> 
+> x <- stats::runif(12); y <- stats::rnorm(12)
+> i <- order(x, y); x <- x[i]; y <- y[i]
+> plot(x,y, main = "arrows(.) and segments(.)")
+> ## draw arrows from point to point :
+> s <- seq(length(x)-1)  # one shorter than data
+> arrows(x[s], y[s], x[s+1], y[s+1], col = 1:3)
+> s <- s[-length(s)]
+> segments(x[s], y[s], x[s+2], y[s+2], col = "pink")
+> 
+> 
+> 
+> cleanEx()
+> nameEx("assocplot")
+> ### * assocplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: assocplot
+> ### Title: Association Plots
+> ### Aliases: assocplot
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> ## Aggregate over sex:
+> x <- margin.table(HairEyeColor, c(1, 2))
+> x
+       Eye
+Hair    Brown Blue Hazel Green
+  Black    68   20    15     5
+  Brown   119   84    54    29
+  Red      26   17    14    14
+  Blond     7   94    10    16
+> assocplot(x, main = "Relation between hair and eye color")
+> 
+> 
+> 
+> cleanEx()
+> nameEx("axTicks")
+> ### * axTicks
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: axTicks
+> ### Title: Compute Axis Tickmark Locations
+> ### Aliases: axTicks
+> ### Keywords: dplot
+> 
+> ### ** Examples
+> 
+>  plot(1:7, 10*21:27)
+>  axTicks(1)
+[1] 1 2 3 4 5 6 7
+>  axTicks(2)
+[1] 210 220 230 240 250 260 270
+>  stopifnot(identical(axTicks(1), axTicks(3)),
++            identical(axTicks(2), axTicks(4)))
+> 
+> ## Show how axTicks() and axis() correspond :
+> op <- par(mfrow = c(3, 1))
+> for(x in 9999 * c(1, 2, 8)) {
++     plot(x, 9, log = "x")
++     cat(formatC(par("xaxp"), width = 5),";", T <- axTicks(1),"\n")
++     rug(T, col =  adjustcolor("red", 0.5), lwd = 4)
++ }
+ 1000 1e+05     3 ; 200 500 1000 2000 5000 10000 20000 50000 1e+05 2e+05 5e+05 
+ 1000 1e+06     2 ; 500 1000 5000 10000 50000 1e+05 5e+05 1e+06 
+ 1000 1e+07     1 ; 1000 10000 1e+05 1e+06 1e+07 
+> par(op)
+> 
+> x <- 9.9*10^(-3:10)
+> plot(x, 1:14, log = "x")
+> axTicks(1) # now length 5, in R <= 2.13.x gave the following
+[1] 1e-02 1e+01 1e+04 1e+07 1e+10
+> axTicks(1, nintLog = Inf) # rather too many
+ [1] 1e-02 1e-01 1e+00 1e+01 1e+02 1e+03 1e+04 1e+05 1e+06 1e+07 1e+08 1e+09
+[13] 1e+10 1e+11
+> 
+> ## An example using axTicks() without reference to an existing plot
+> ## (copying R's internal procedures for setting axis ranges etc.),
+> ## You do need to supply _all_ of axp, usr, log, nintLog
+> ## standard logarithmic y axis labels
+> ylims <- c(0.2, 88)
+> get_axp <- function(x) 10^c(ceiling(x[1]), floor(x[2]))
+> ## mimic par("yaxs") == "i"
+> usr.i <- log10(ylims)
+> (aT.i <- axTicks(side = 2, usr = usr.i,
++                  axp = c(get_axp(usr.i), n = 3), log = TRUE, nintLog = 5))
+[1]  0.2  0.5  1.0  2.0  5.0 10.0 20.0 50.0
+> ## mimic (default) par("yaxs") == "r"
+> usr.r <- extendrange(r = log10(ylims), f = 0.04)
+> (aT.r <- axTicks(side = 2, usr = usr.r,
++                  axp = c(get_axp(usr.r), 3), log = TRUE, nintLog = 5))
+[1]   0.2   0.5   1.0   2.0   5.0  10.0  20.0  50.0 100.0
+> 
+> ## Prove that we got it right :
+> plot(0:1, ylims, log = "y", yaxs = "i")
+> stopifnot(all.equal(aT.i, axTicks(side = 2)))
+> 
+> plot(0:1, ylims, log = "y", yaxs = "r")
+> stopifnot(all.equal(aT.r, axTicks(side = 2)))
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("axis.POSIXct")
+> ### * axis.POSIXct
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: axis.POSIXct
+> ### Title: Date and Date-time Plotting Functions
+> ### Aliases: axis.POSIXct axis.Date
+> ### Keywords: utilities chron
+> 
+> ### ** Examples
+> 
+> with(beaver1, {
++ time <- strptime(paste(1990, day, time %/% 100, time %% 100),
++                  "%Y %j %H %M")
++ plot(time, temp, type = "l") # axis at 4-hour intervals.
++ # now label every hour on the time axis
++ plot(time, temp, type = "l", xaxt = "n")
++ r <- as.POSIXct(round(range(time), "hours"))
++ axis.POSIXct(1, at = seq(r[1], r[2], by = "hour"), format = "%H")
++ })
+> 
+> plot(.leap.seconds, seq_along(.leap.seconds), type = "n", yaxt = "n",
++      xlab = "leap seconds", ylab = "", bty = "n")
+> rug(.leap.seconds)
+> ## or as dates
+> lps <- as.Date(.leap.seconds)
+> plot(lps, seq_along(.leap.seconds),
++      type = "n", yaxt = "n", xlab = "leap seconds",
++      ylab = "", bty = "n")
+> rug(lps)
+> 
+> ## 100 random dates in a 10-week period
+> random.dates <- as.Date("2001/1/1") + 70*sort(stats::runif(100))
+> plot(random.dates, 1:100)
+> # or for a better axis labelling
+> plot(random.dates, 1:100, xaxt = "n")
+> axis.Date(1, at = seq(as.Date("2001/1/1"), max(random.dates)+6, "weeks"))
+> axis.Date(1, at = seq(as.Date("2001/1/1"), max(random.dates)+6, "days"),
++      labels = FALSE, tcl = -0.2)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("axis")
+> ### * axis
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: axis
+> ### Title: Add an Axis to a Plot
+> ### Aliases: axis
+> ### Keywords: aplot
+> 
+> ### ** Examples
+> 
+> require(stats) # for rnorm
+> plot(1:4, rnorm(4), axes = FALSE)
+> axis(1, 1:4, LETTERS[1:4])
+> axis(2)
+> box() #- to make it look "as usual"
+> 
+> plot(1:7, rnorm(7), main = "axis() examples",
++      type = "s", xaxt = "n", frame = FALSE, col = "red")
+> axis(1, 1:7, LETTERS[1:7], col.axis = "blue")
+> # unusual options:
+> axis(4, col = "violet", col.axis = "dark violet", lwd = 2)
+> axis(3, col = "gold", lty = 2, lwd = 0.5)
+> 
+> # one way to have a custom x axis
+> plot(1:10, xaxt = "n")
+> axis(1, xaxp = c(2, 9, 7))
+> 
+> ## Changing default gap between labels:
+> plot(0:100, type="n", axes=FALSE, ann=FALSE)
+> title(quote("axis(1, .., gap.axis = f)," ~~ f >= 0))
+> axis(2, at = 5*(0:20), las = 1, gap.axis = 1/4)
+> gaps <- c(4, 2, 1, 1/2, 1/4, 0.1, 0)
+> chG <- paste0(ifelse(gaps == 1, "default:  ", ""),
++               "gap.axis=", formatC(gaps))
+> jj <- seq_along(gaps)
+> linG <- -2.5*(jj-1)
+> for(j in jj) {
++     isD <- gaps[j] == 1 # is default
++     axis (1, at=5*(0:20), gap.axis = gaps[j], padj=-1, line = linG[j],
++           col.axis = if(isD) "forest green" else 1, font.axis= 1+isD)
++ }
+> mtext(chG, side=1, padj=-1, line = linG -1/2, cex=3/4,
++       col = ifelse(gaps == 1, "forest green", "blue3"))
+> ## now shrink the window (in x- and y-direction) and observe the axis labels drawn
+> 
+> 
+> 
+> cleanEx()
+> nameEx("barplot")
+> ### * barplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: barplot
+> ### Title: Bar Plots
+> ### Aliases: barplot barplot.default barplot.formula
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> # Formula method
+> barplot(GNP ~ Year, data = longley)
+> barplot(cbind(Employed, Unemployed) ~ Year, data = longley)
+> 
+> ## 3rd form of formula - 2 categories :
+> op <- par(mfrow = 2:1, mgp = c(3,1,0)/2, mar = .1+c(3,3:1))
+> summary(d.Titanic <- as.data.frame(Titanic))
+  Class       Sex        Age     Survived      Freq       
+ 1st :8   Male  :16   Child:16   No :16   Min.   :  0.00  
+ 2nd :8   Female:16   Adult:16   Yes:16   1st Qu.:  0.75  
+ 3rd :8                                   Median : 13.50  
+ Crew:8                                   Mean   : 68.78  
+                                          3rd Qu.: 77.00  
+                                          Max.   :670.00  
+> barplot(Freq ~ Class + Survived, data = d.Titanic,
++         subset = Age == "Adult" & Sex == "Male",
++         main = "barplot(Freq ~ Class + Survived, *)", ylab = "# {passengers}", legend = TRUE)
+> # Corresponding table :
+> (xt <- xtabs(Freq ~ Survived + Class + Sex, d.Titanic, subset = Age=="Adult"))
+, , Sex = Male
+
+        Class
+Survived 1st 2nd 3rd Crew
+     No  118 154 387  670
+     Yes  57  14  75  192
+
+, , Sex = Female
+
+        Class
+Survived 1st 2nd 3rd Crew
+     No    4  13  89    3
+     Yes 140  80  76   20
+
+> # Alternatively, a mosaic plot :
+> mosaicplot(xt[,,"Male"], main = "mosaicplot(Freq ~ Class + Survived, *)", color=TRUE)
+> par(op)
+> 
+> 
+> # Default method
+> require(grDevices) # for colours
+> tN <- table(Ni <- stats::rpois(100, lambda = 5))
+> r <- barplot(tN, col = rainbow(20))
+> #- type = "h" plotting *is* 'bar'plot
+> lines(r, tN, type = "h", col = "red", lwd = 2)
+> 
+> barplot(tN, space = 1.5, axisnames = FALSE,
++         sub = "barplot(..., space= 1.5, axisnames = FALSE)")
+> 
+> barplot(VADeaths, plot = FALSE)
+[1] 0.7 1.9 3.1 4.3
+> barplot(VADeaths, plot = FALSE, beside = TRUE)
+     [,1] [,2] [,3] [,4]
+[1,]  1.5  7.5 13.5 19.5
+[2,]  2.5  8.5 14.5 20.5
+[3,]  3.5  9.5 15.5 21.5
+[4,]  4.5 10.5 16.5 22.5
+[5,]  5.5 11.5 17.5 23.5
+> 
+> mp <- barplot(VADeaths) # default
+> tot <- colMeans(VADeaths)
+> text(mp, tot + 3, format(tot), xpd = TRUE, col = "blue")
+> barplot(VADeaths, beside = TRUE,
++         col = c("lightblue", "mistyrose", "lightcyan",
++                 "lavender", "cornsilk"),
++         legend = rownames(VADeaths), ylim = c(0, 100))
+> title(main = "Death Rates in Virginia", font.main = 4)
+> 
+> hh <- t(VADeaths)[, 5:1]
+> mybarcol <- "gray20"
+> mp <- barplot(hh, beside = TRUE,
++         col = c("lightblue", "mistyrose",
++                 "lightcyan", "lavender"),
++         legend = colnames(VADeaths), ylim = c(0,100),
++         main = "Death Rates in Virginia", font.main = 4,
++         sub = "Faked upper 2*sigma error bars", col.sub = mybarcol,
++         cex.names = 1.5)
+> segments(mp, hh, mp, hh + 2*sqrt(1000*hh/100), col = mybarcol, lwd = 1.5)
+> stopifnot(dim(mp) == dim(hh))  # corresponding matrices
+> mtext(side = 1, at = colMeans(mp), line = -2,
++       text = paste("Mean", formatC(colMeans(hh))), col = "red")
+> 
+> # Bar shading example
+> barplot(VADeaths, angle = 15+10*1:5, density = 20, col = "black",
++         legend = rownames(VADeaths))
+> title(main = list("Death Rates in Virginia", font = 4))
+> 
+> # Border color
+> barplot(VADeaths, border = "dark blue") 
+> 
+> # Log scales (not much sense here)
+> barplot(tN, col = heat.colors(12), log = "y")
+> barplot(tN, col = gray.colors(20), log = "xy")
+> 
+> # Legend location
+> barplot(height = cbind(x = c(465, 91) / 465 * 100,
++                        y = c(840, 200) / 840 * 100,
++                        z = c(37, 17) / 37 * 100),
++         beside = FALSE,
++         width = c(465, 840, 37),
++         col = c(1, 2),
++         legend.text = c("A", "B"),
++         args.legend = list(x = "topleft"))
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("box")
+> ### * box
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: box
+> ### Title: Draw a Box around a Plot
+> ### Aliases: box
+> ### Keywords: aplot
+> 
+> ### ** Examples
+> 
+> plot(1:7, abs(stats::rnorm(7)), type = "h", axes = FALSE)
+> axis(1, at = 1:7, labels = letters[1:7])
+> box(lty = '1373', col = 'red')
+> 
+> 
+> 
+> cleanEx()
+> nameEx("boxplot")
+> ### * boxplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: boxplot
+> ### Title: Box Plots
+> ### Aliases: boxplot boxplot.default boxplot.formula
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> ## boxplot on a formula:
+> boxplot(count ~ spray, data = InsectSprays, col = "lightgray")
+> # *add* notches (somewhat funny here):
+> boxplot(count ~ spray, data = InsectSprays,
++         notch = TRUE, add = TRUE, col = "blue")
+Warning in bxp(list(stats = c(7, 11, 14, 18.5, 23, 7, 12, 16.5, 18, 21,  :
+  some notches went outside hinges ('box'): maybe set notch=FALSE
+> 
+> boxplot(decrease ~ treatment, data = OrchardSprays,
++         log = "y", col = "bisque")
+> 
+> rb <- boxplot(decrease ~ treatment, data = OrchardSprays, col = "bisque")
+> title("Comparing boxplot()s and non-robust mean +/- SD")
+> 
+> mn.t <- tapply(OrchardSprays$decrease, OrchardSprays$treatment, mean)
+> sd.t <- tapply(OrchardSprays$decrease, OrchardSprays$treatment, sd)
+> xi <- 0.3 + seq(rb$n)
+> points(xi, mn.t, col = "orange", pch = 18)
+> arrows(xi, mn.t - sd.t, xi, mn.t + sd.t,
++        code = 3, col = "pink", angle = 75, length = .1)
+> 
+> ## boxplot on a matrix:
+> mat <- cbind(Uni05 = (1:100)/21, Norm = rnorm(100),
++              `5T` = rt(100, df = 5), Gam2 = rgamma(100, shape = 2))
+> boxplot(mat) # directly, calling boxplot.matrix()
+> 
+> ## boxplot on a data frame:
+> df. <- as.data.frame(mat)
+> par(las = 1) # all axis labels horizontal
+> boxplot(df., main = "boxplot(*, horizontal = TRUE)", horizontal = TRUE)
+> 
+> ## Using 'at = ' and adding boxplots -- example idea by Roger Bivand :
+> boxplot(len ~ dose, data = ToothGrowth,
++         boxwex = 0.25, at = 1:3 - 0.2,
++         subset = supp == "VC", col = "yellow",
++         main = "Guinea Pigs' Tooth Growth",
++         xlab = "Vitamin C dose mg",
++         ylab = "tooth length",
++         xlim = c(0.5, 3.5), ylim = c(0, 35), yaxs = "i")
+> boxplot(len ~ dose, data = ToothGrowth, add = TRUE,
++         boxwex = 0.25, at = 1:3 + 0.2,
++         subset = supp == "OJ", col = "orange")
+> legend(2, 9, c("Ascorbic acid", "Orange juice"),
++        fill = c("yellow", "orange"))
+> 
+> ## With less effort (slightly different) using factor *interaction*:
+> boxplot(len ~ dose:supp, data = ToothGrowth,
++         boxwex = 0.5, col = c("orange", "yellow"),
++         main = "Guinea Pigs' Tooth Growth",
++         xlab = "Vitamin C dose mg", ylab = "tooth length",
++         sep = ":", lex.order = TRUE, ylim = c(0, 35), yaxs = "i")
+> 
+> ## more examples in  help(bxp)
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("boxplot.matrix")
+> ### * boxplot.matrix
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: boxplot.matrix
+> ### Title: Draw a Boxplot for each Column (Row) of a Matrix
+> ### Aliases: boxplot.matrix
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> ## Very similar to the example in ?boxplot
+> mat <- cbind(Uni05 = (1:100)/21, Norm = rnorm(100),
++              T5 = rt(100, df = 5), Gam2 = rgamma(100, shape = 2))
+> boxplot(mat, main = "boxplot.matrix(...., main = ...)",
++         notch = TRUE, col = 1:4)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("bxp")
+> ### * bxp
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: bxp
+> ### Title: Draw Box Plots from Summaries
+> ### Aliases: bxp
+> ### Keywords: aplot
+> 
+> ### ** Examples
+> 
+> require(stats)
+> set.seed(753)
+> (bx.p <- boxplot(split(rt(100, 4), gl(5, 20))))
+$stats
+            [,1]        [,2]        [,3]        [,4]        [,5]
+[1,] -1.66391873 -2.02625162 -2.12785004 -2.76510496 -1.70034047
+[2,] -0.55308292 -0.65897584 -0.86705616 -1.63431484 -0.81848966
+[3,] -0.06763313  0.04887846  0.09674026 -0.06712275 -0.01150075
+[4,]  0.68813940  0.91705734  1.05562526  0.56746581  0.49017934
+[5,]  1.14222667  3.16270157  2.07574986  2.09523462  1.87734641
+
+$n
+[1] 20 20 20 20 20
+
+$conf
+           [,1]       [,2]       [,3]       [,4]       [,5]
+[1,] -0.5061554 -0.5079321 -0.5825407 -0.8450091 -0.4738519
+[2,]  0.3708891  0.6056890  0.7760212  0.7107636  0.4508504
+
+$out
+[1]  4.115274  3.224584  3.920438  4.168341 -4.357819  2.498006
+
+$group
+[1] 1 1 1 4 5 5
+
+$names
+[1] "1" "2" "3" "4" "5"
+
+> op <- par(mfrow =  c(2, 2))
+> bxp(bx.p, xaxt = "n")
+> bxp(bx.p, notch = TRUE, axes = FALSE, pch = 4, boxfill = 1:5)
+Warning in bxp(bx.p, notch = TRUE, axes = FALSE, pch = 4, boxfill = 1:5) :
+  some notches went outside hinges ('box'): maybe set notch=FALSE
+> bxp(bx.p, notch = TRUE, boxfill = "lightblue", frame = FALSE,
++     outl = FALSE, main = "bxp(*, frame= FALSE, outl= FALSE)")
+Warning in bxp(bx.p, notch = TRUE, boxfill = "lightblue", frame = FALSE,  :
+  some notches went outside hinges ('box'): maybe set notch=FALSE
+> bxp(bx.p, notch = TRUE, boxfill = "lightblue", border = 2:6,
++     ylim = c(-4,4), pch = 22, bg = "green", log = "x",
++     main = "... log = 'x', ylim = *")
+Warning in bxp(bx.p, notch = TRUE, boxfill = "lightblue", border = 2:6,  :
+  some notches went outside hinges ('box'): maybe set notch=FALSE
+> par(op)
+> op <- par(mfrow = c(1, 2))
+> 
+> ## single group -- no label
+> boxplot (weight ~ group, data = PlantGrowth, subset = group == "ctrl")
+> ## with label
+> bx <- boxplot(weight ~ group, data = PlantGrowth,
++               subset = group == "ctrl", plot = FALSE)
+> bxp(bx, show.names=TRUE)
+> par(op)
+> 
+> z <- split(rnorm(1000), rpois(1000, 2.2))
+> boxplot(z, whisklty = 3, main = "boxplot(z, whisklty = 3)")
+> 
+> ## Colour support similar to plot.default:
+> op <- par(mfrow = 1:2, bg = "light gray", fg = "midnight blue")
+> boxplot(z,   col.axis = "skyblue3", main = "boxplot(*, col.axis=..,main=..)")
+> plot(z[[1]], col.axis = "skyblue3", main =    "plot(*, col.axis=..,main=..)")
+> mtext("par(bg=\"light gray\", fg=\"midnight blue\")",
++       outer = TRUE, line = -1.2)
+> par(op)
+> 
+> ## Mimic S-Plus:
+> splus <- list(boxwex = 0.4, staplewex = 1, outwex = 1, boxfill = "grey40",
++               medlwd = 3, medcol = "white", whisklty = 3, outlty = 1, outpch = NA)
+> boxplot(z, pars = splus)
+> ## Recycled and "sweeping" parameters
+> op <- par(mfrow = c(1,2))
+>  boxplot(z, border = 1:5, lty = 3, medlty = 1, medlwd = 2.5)
+>  boxplot(z, boxfill = 1:3, pch = 1:5, lwd = 1.5, medcol = "white")
+> par(op)
+> ## too many possibilities
+> boxplot(z, boxfill = "light gray", outpch = 21:25, outlty = 2,
++         bg = "pink", lwd = 2,
++         medcol = "dark blue", medcex = 2, medpch = 20)
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("cdplot")
+> ### * cdplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: cdplot
+> ### Title: Conditional Density Plots
+> ### Aliases: cdplot cdplot.default cdplot.formula
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> ## NASA space shuttle o-ring failures
+> fail <- factor(c(2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1,
++                  1, 2, 1, 1, 1, 1, 1),
++                levels = 1:2, labels = c("no", "yes"))
+> temperature <- c(53, 57, 58, 63, 66, 67, 67, 67, 68, 69, 70, 70,
++                  70, 70, 72, 73, 75, 75, 76, 76, 78, 79, 81)
+> 
+> ## CD plot
+> cdplot(fail ~ temperature)
+> cdplot(fail ~ temperature, bw = 2)
+> cdplot(fail ~ temperature, bw = "SJ")
+> 
+> ## compare with spinogram
+> (spineplot(fail ~ temperature, breaks = 3))
+           fail
+temperature no yes
+    [50,60]  0   3
+    (60,70]  8   3
+    (70,80]  7   1
+    (80,90]  1   0
+> 
+> ## highlighting for failures
+> cdplot(fail ~ temperature, ylevels = 2:1)
+> 
+> ## scatter plot with conditional density
+> cdens <- cdplot(fail ~ temperature, plot = FALSE)
+> plot(I(as.numeric(fail) - 1) ~ jitter(temperature, factor = 2),
++      xlab = "Temperature", ylab = "Conditional failure probability")
+> lines(53:81, 1 - cdens[[1]](53:81), col = 2)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("clip")
+> ### * clip
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: clip
+> ### Title: Set Clipping Region
+> ### Aliases: clip
+> ### Keywords: dplot
+> 
+> ### ** Examples
+> 
+> x <- rnorm(1000)
+> hist(x, xlim = c(-4,4))
+> usr <- par("usr")
+> clip(usr[1], -2, usr[3], usr[4])
+> hist(x, col = 'red', add = TRUE)
+> clip(2, usr[2], usr[3], usr[4])
+> hist(x, col = 'blue', add = TRUE)
+> do.call("clip", as.list(usr))  # reset to plot region
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("contour")
+> ### * contour
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: contour
+> ### Title: Display Contours
+> ### Aliases: contour contour.default
+> ### Keywords: hplot aplot
+> 
+> ### ** Examples
+> 
+> require(grDevices) # for colours
+> x <- -6:16
+> op <- par(mfrow = c(2, 2))
+> contour(outer(x, x), method = "edge", vfont = c("sans serif", "plain"))
+> z <- outer(x, sqrt(abs(x)), FUN = "/")
+> image(x, x, z)
+> contour(x, x, z, col = "pink", add = TRUE, method = "edge",
++         vfont = c("sans serif", "plain"))
+> contour(x, x, z, ylim = c(1, 6), method = "simple", labcex = 1,
++         xlab = quote(x[1]), ylab = quote(x[2]))
+> contour(x, x, z, ylim = c(-6, 6), nlev = 20, lty = 2, method = "simple",
++         main = "20 levels; \"simple\" labelling method")
+> par(op)
+> 
+> ## Persian Rug Art:
+> x <- y <- seq(-4*pi, 4*pi, len = 27)
+> r <- sqrt(outer(x^2, y^2, "+"))
+> opar <- par(mfrow = c(2, 2), mar = rep(0, 4))
+> for(f in pi^(0:3))
++   contour(cos(r^2)*exp(-r/f),
++           drawlabels = FALSE, axes = FALSE, frame = TRUE)
+> 
+> rx <- range(x <- 10*1:nrow(volcano))
+> ry <- range(y <- 10*1:ncol(volcano))
+> ry <- ry + c(-1, 1) * (diff(rx) - diff(ry))/2
+> tcol <- terrain.colors(12)
+> par(opar); opar <- par(pty = "s", bg = "lightcyan")
+> plot(x = 0, y = 0, type = "n", xlim = rx, ylim = ry, xlab = "", ylab = "")
+> u <- par("usr")
+> rect(u[1], u[3], u[2], u[4], col = tcol[8], border = "red")
+> contour(x, y, volcano, col = tcol[2], lty = "solid", add = TRUE,
++         vfont = c("sans serif", "plain"))
+> title("A Topographic Map of Maunga Whau", font = 4)
+> abline(h = 200*0:4, v = 200*0:4, col = "lightgray", lty = 2, lwd = 0.1)
+> 
+> ## contourLines produces the same contour lines as contour
+> plot(x = 0, y = 0, type = "n", xlim = rx, ylim = ry, xlab = "", ylab = "")
+> u <- par("usr")
+> rect(u[1], u[3], u[2], u[4], col = tcol[8], border = "red")
+> contour(x, y, volcano, col = tcol[1], lty = "solid", add = TRUE,
++         vfont = c("sans serif", "plain"))
+> line.list <- contourLines(x, y, volcano)
+> invisible(lapply(line.list, lines, lwd=3, col=adjustcolor(2, .3)))
+> par(opar)
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("convertXY")
+> ### * convertXY
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: convertXY
+> ### Title: Convert between Graphics Coordinate Systems
+> ### Aliases: grconvertX grconvertY
+> ### Keywords: dplot
+> 
+> ### ** Examples
+> 
+> op <- par(omd=c(0.1, 0.9, 0.1, 0.9), mfrow = c(1, 2))
+> plot(1:4)
+> for(tp in c("in", "dev", "ndc", "nfc", "npc", "nic", "lines", "chars"))
++     print(grconvertX(c(1.0, 4.0), "user", tp))
+[1] 1.577778 3.022222
+[1] 113.6 217.6
+[1] 0.2253968 0.4317460
+[1] 0.3134921 0.8293651
+[1] 0.03703704 0.96296296
+[1] 0.1567460 0.4146825
+[1]  7.888889 15.111111
+[1]  7.888889 15.111111
+> par(op)
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("coplot")
+> ### * coplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: coplot
+> ### Title: Conditioning Plots
+> ### Aliases: coplot co.intervals
+> ### Keywords: hplot aplot
+> 
+> ### ** Examples
+> 
+> ## Tonga Trench Earthquakes
+> coplot(lat ~ long | depth, data = quakes)
+> given.depth <- co.intervals(quakes$depth, number = 4, overlap = .1)
+> coplot(lat ~ long | depth, data = quakes, given.v = given.depth, rows = 1)
+> 
+> ## Conditioning on 2 variables:
+> ll.dm <- lat ~ long | depth * mag
+> coplot(ll.dm, data = quakes)
+> coplot(ll.dm, data = quakes, number = c(4, 7), show.given = c(TRUE, FALSE))
+> coplot(ll.dm, data = quakes, number = c(3, 7),
++        overlap = c(-.5, .1)) # negative overlap DROPS values
+> 
+> ## given two factors
+> Index <- seq(length = nrow(warpbreaks)) # to get nicer default labels
+> coplot(breaks ~ Index | wool * tension, data = warpbreaks,
++        show.given = 0:1)
+> coplot(breaks ~ Index | wool * tension, data = warpbreaks,
++        col = "red", bg = "pink", pch = 21,
++        bar.bg = c(fac = "light blue"))
+> 
+> ## Example with empty panels:
+> with(data.frame(state.x77), {
++ coplot(Life.Exp ~ Income | Illiteracy * state.region, number = 3,
++        panel = function(x, y, ...) panel.smooth(x, y, span = .8, ...))
++ ## y ~ factor -- not really sensible, but 'show off':
++ coplot(Life.Exp ~ state.region | Income * state.division,
++        panel = panel.smooth)
++ })
+> 
+> 
+> 
+> cleanEx()
+> nameEx("curve")
+> ### * curve
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: curve
+> ### Title: Draw Function Plots
+> ### Aliases: curve plot.function
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> plot(qnorm) # default range c(0, 1) is appropriate here,
+>             # but end values are -/+Inf and so are omitted.
+> plot(qlogis, main = "The Inverse Logit : qlogis()")
+> abline(h = 0, v = 0:2/2, lty = 3, col = "gray")
+> 
+> curve(sin, -2*pi, 2*pi, xname = "t")
+> curve(tan, xname = "t", add = NA,
++       main = "curve(tan)  --> same x-scale as previous plot")
+> 
+> op <- par(mfrow = c(2, 2))
+> curve(x^3 - 3*x, -2, 2)
+> curve(x^2 - 2, add = TRUE, col = "violet")
+> 
+> ## simple and advanced versions, quite similar:
+> plot(cos, -pi,  3*pi)
+> curve(cos, xlim = c(-pi, 3*pi), n = 1001, col = "blue", add = TRUE)
+> 
+> chippy <- function(x) sin(cos(x)*exp(-x/2))
+> curve(chippy, -8, 7, n = 2001)
+> plot (chippy, -8, -5)
+> 
+> for(ll in c("", "x", "y", "xy"))
++    curve(log(1+x), 1, 100, log = ll, sub = paste0("log = '", ll, "'"))
+> par(op)
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("dotchart")
+> ### * dotchart
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: dotchart
+> ### Title: Cleveland's Dot Plots
+> ### Aliases: dotchart
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> dotchart(VADeaths, main = "Death Rates in Virginia - 1940")
+> op <- par(xaxs = "i")  # 0 -- 100%
+> dotchart(t(VADeaths), xlim = c(0,100),
++          main = "Death Rates in Virginia - 1940")
+> par(op)
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("filled.contour")
+> ### * filled.contour
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: filled.contour
+> ### Title: Level (Contour) Plots
+> ### Aliases: filled.contour .filled.contour
+> ### Keywords: hplot aplot
+> 
+> ### ** Examples
+> 
+> require("grDevices") # for colours
+> filled.contour(volcano, asp = 1) # simple
+> 
+> x <- 10*1:nrow(volcano)
+> y <- 10*1:ncol(volcano)
+> filled.contour(x, y, volcano, color = function(n) hcl.colors(n, "terrain"),
++     plot.title = title(main = "The Topography of Maunga Whau",
++     xlab = "Meters North", ylab = "Meters West"),
++     plot.axes = { axis(1, seq(100, 800, by = 100))
++                   axis(2, seq(100, 600, by = 100)) },
++     key.title = title(main = "Height\n(meters)"),
++     key.axes = axis(4, seq(90, 190, by = 10)))  # maybe also asp = 1
+> mtext(paste("filled.contour(.) from", R.version.string),
++       side = 1, line = 4, adj = 1, cex = .66)
+> 
+> # Annotating a filled contour plot
+> a <- expand.grid(1:20, 1:20)
+> b <- matrix(a[,1] + a[,2], 20)
+> filled.contour(x = 1:20, y = 1:20, z = b,
++                plot.axes = { axis(1); axis(2); points(10, 10) })
+> 
+> ## Persian Rug Art:
+> x <- y <- seq(-4*pi, 4*pi, len = 27)
+> r <- sqrt(outer(x^2, y^2, "+"))
+> filled.contour(cos(r^2)*exp(-r/(2*pi)), axes = FALSE)
+> ## rather, the key *should* be labeled:
+> filled.contour(cos(r^2)*exp(-r/(2*pi)), frame.plot = FALSE,
++                plot.axes = {})
+> 
+> 
+> 
+> cleanEx()
+> nameEx("fourfoldplot")
+> ### * fourfoldplot
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: fourfoldplot
+> ### Title: Fourfold Plots
+> ### Aliases: fourfoldplot
+> ### Keywords: hplot
+> 
+> ### ** Examples
+> 
+> ## Use the Berkeley admission data as in Friendly (1995).
+> x <- aperm(UCBAdmissions, c(2, 1, 3))
+> dimnames(x)[[2]] <- c("Yes", "No")
+> names(dimnames(x)) <- c("Sex", "Admit?", "Department")
+> stats::ftable(x)
+              Department   A   B   C   D   E   F
+Sex    Admit?                                   
+Male   Yes               512 353 120 138  53  22
+       No                313 207 205 279 138 351
+Female Yes                89  17 202 131  94  24
+       No                 19   8 391 244 299 317
+> 
+> ## Fourfold display of data aggregated over departments, with
+> ## frequencies standardized to equate the margins for admission
+> ## and sex.
+> ## Figure 1 in Friendly (1994).
+> fourfoldplot(margin.table(x, c(1, 2)))
+> 
+> ## Fourfold display of x, with frequencies in each table
+> ## standardized to equate the margins for admission and sex.
+> ## Figure 2 in Friendly (1994).
+> fourfoldplot(x)
+> 
+> ## Fourfold display of x, with frequencies in each table
+> ## standardized to equate the margins for admission. but not
+> ## for sex.
+> ## Figure 3 in Friendly (1994).
+> fourfoldplot(x, margin = 2)
+> 
+> 
+> 
+> cleanEx()
+> nameEx("grid")
+> ### * grid
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: grid
+> ### Title: Add Grid to a Plot
+> ### Aliases: grid
+> ### Keywords: aplot
+> 
+> ### ** Examples
+> 
+> plot(1:3)
+> grid(NA, 5, lwd = 2) # grid only in y-direction
+> 
+> ## maybe change the desired number of tick marks:  par(lab = c(mx, my, 7))
+> op <- par(mfcol = 1:2)
+> with(iris,
++      {
++      plot(Sepal.Length, Sepal.Width, col = as.integer(Species),
++           xlim = c(4, 8), ylim = c(2, 4.5), panel.first = grid(),
++           main = "with(iris,  plot(...., panel.first = grid(), ..) )")
++      plot(Sepal.Length, Sepal.Width, col = as.integer(Species),
++           panel.first = grid(3, lty = 1, lwd = 2),
++           main = "... panel.first = grid(3, lty = 1, lwd = 2), ..")
++      }
++     )
+> par(op)
+> 
+> 
+> 
+> 
+> graphics::par(get("par.postscript", pos = 'CheckExEnv'))
+> cleanEx()
+> nameEx("hist.POSIXt")
+> ### * hist.POSIXt
+> 
+> flush(stderr()); flush(stdout())
+> 
+> ### Name: hist.POSIXt
+> ### Title: Histogram of a Date or Date-Time Object
+> ### Aliases: hist.POSIXt hist.Date
+> ### Keywords: chron dplot hplot
+> 
+> ### ** Examples
+> 
+> hist(.leap.seconds, "years", freq = TRUE)
+Warning in breaks + fuzz :
+  longer object length is not a multiple of shorter object length
+Error in hist.default(unclass(x), unclass(breaks), plot = FALSE, warn.unused = FALSE,  : 
+  some 'x' not counted; maybe 'breaks' do not span range of 'x'
+Calls: hist -> hist.POSIXt -> hist.default
+Execution halted

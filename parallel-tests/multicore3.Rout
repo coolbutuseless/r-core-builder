@@ -1,0 +1,40 @@
+
+R version 3.6.0 (2019-04-26) -- "Planting of a Tree"
+Copyright (C) 2019 The R Foundation for Statistical Computing
+Platform: x86_64-apple-darwin15.6.0 (64-bit)
+
+R is free software and comes with ABSOLUTELY NO WARRANTY.
+You are welcome to redistribute it under certain conditions.
+Type 'license()' or 'licence()' for distribution details.
+
+R is a collaborative project with many contributors.
+Type 'contributors()' for more information and
+'citation()' on how to cite R or R packages in publications.
+
+Type 'demo()' for some demos, 'help()' for on-line help, or
+'help.start()' for an HTML browser interface to help.
+Type 'q()' to quit R.
+
+> library(parallel)
+> 
+> # use the same random numbers for all values
+> set.seed(1)
+> simplify2array(mclapply(rep(4, 5), rnorm))
+          [,1]        [,2]       [,3]       [,4]       [,5]
+[1,] 1.1837709 -0.08983083 -1.1731070  1.9632602  0.1405368
+[2,] 0.1439684 -0.51360037  0.2354262 -0.5559100 -0.5293933
+[3,] 0.4598360 -0.02879310 -1.6956900  0.5020841  2.4169767
+[4,] 0.4948551  0.24041843  0.4201650  0.4813488  0.5347274
+> 
+> set.seed(1)
+> simplify2array(mclapply(rep(4, 5), rnorm, mc.preschedule = FALSE,
++                 mc.set.seed = FALSE))
+           [,1]       [,2]       [,3]       [,4]       [,5]
+[1,] -0.6264538 -0.6264538 -0.6264538 -0.6264538 -0.6264538
+[2,]  0.1836433  0.1836433  0.1836433  0.1836433  0.1836433
+[3,] -0.8356286 -0.8356286 -0.8356286 -0.8356286 -0.8356286
+[4,]  1.5952808  1.5952808  1.5952808  1.5952808  1.5952808
+> 
+> proc.time()
+   user  system elapsed 
+  0.148   0.066   0.188 
