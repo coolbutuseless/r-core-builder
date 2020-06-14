@@ -12,8 +12,8 @@ jobs:
         run: |
           sudo apt-get update
           sudo apt-get install -y gfortran g++ \
-            libreadline8 libreadline-dev xorg-dev libbz2-dev \
-            liblzma-dev libpcre2-deva libcurl4-openssl-dev \
+            libreadline-dev xorg-dev libbz2-dev \
+            liblzma-dev libpcre2-dev libcurl4-openssl-dev \
             libjpeg-dev libcairo2-dev libtiff-dev libicu-dev
 
       - name: Configure R
