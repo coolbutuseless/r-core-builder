@@ -8,10 +8,18 @@ jobs:
     steps:
       - uses: actions/checkout@master
 
+      - name: System setup
+        run: |
+          apt-get update
+          apt-get install -y gfortran g++ \
+            libreadline8 libreadline-dev xorg-dev libbz2-dev \
+            liblzma-dev libpcre2-deva libcurl4-openssl-dev \
+            libjpeg-dev libcairo2-dev libtiff-dev libicu-dev
+
       - name: Configure R
         run: |
           cd r-devel
-          ./configure
+          ./configure --without-recommended-packages
 
       - name: Build R
         run: |
