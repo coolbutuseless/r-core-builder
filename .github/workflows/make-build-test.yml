@@ -5,20 +5,20 @@ on: [push, pull_request]
 jobs:
   R-make-test:
     runs-on: ubuntu-latest
-    
-    - uses: actions/checkout@master
+    steps:
+      - uses: actions/checkout@master
 
-    - name: Configure R
-      run: |
-        cd r-devel
-        ./configure
+      - name: Configure R
+        run: |
+          cd r-devel
+          ./configure
 
-    - name: Build R
-      run: |
-        cd r-devel
-        make
+      - name: Build R
+        run: |
+          cd r-devel
+          make
 
-    - name: Test R
-      run: |
-        cd r-devel
-        make check-devel
+      - name: Test R
+        run: |
+          cd r-devel
+          make check-devel
