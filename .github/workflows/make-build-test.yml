@@ -14,7 +14,8 @@ jobs:
           sudo apt-get install -y gfortran g++ \
             libreadline-dev xorg-dev libbz2-dev \
             liblzma-dev libpcre2-dev libcurl4-openssl-dev \
-            libjpeg-dev libcairo2-dev libtiff-dev libicu-dev
+            libjpeg-dev libcairo2-dev libtiff-dev libicu-dev \
+            texinfo texlive
 
       - name: Configure R
         run: |
