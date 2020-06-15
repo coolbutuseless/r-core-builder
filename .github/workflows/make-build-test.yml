@@ -9,9 +9,10 @@ jobs:
       - uses: actions/checkout@master
 
       - name: System setup
+        #TODO: cache this step uses: actions/cache@v2
         run: |
           sudo apt-get update
-          sudo apt-get install -y gfortran g++ \
+          sudo apt-get install -y subversion gfortran g++ \
             libreadline-dev xorg-dev libbz2-dev \
             liblzma-dev libpcre2-dev libcurl4-openssl-dev \
             libjpeg-dev libcairo2-dev libtiff-dev libicu-dev \
@@ -32,3 +33,12 @@ jobs:
         run: |
           cd r-devel
           make check-devel
+
+      - name: Create patch
+        uses: actions/upload-artifact@v2
+        with:
+          name: patch
+          path: r-devel/patch
+        run: |
+          cd r-devel
+          svn diff > patch
