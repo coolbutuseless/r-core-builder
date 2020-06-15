@@ -35,10 +35,12 @@ jobs:
           make check-devel
 
       - name: Create patch
+        run: |
+          cd r-devel
+          svn diff > patch
+
+      - name: Upload patch
         uses: actions/upload-artifact@v2
         with:
           name: patch
           path: r-devel/patch
-        run: |
-          cd r-devel
-          svn diff > patch
