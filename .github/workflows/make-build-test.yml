@@ -25,7 +25,6 @@ jobs:
       - name: Build R
         run: |
           cd r-devel
-          rm non-tarball
           make
 
       - name: Test R
